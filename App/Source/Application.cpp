@@ -3,7 +3,7 @@
 
 Application::Application()
 	: m_window(nullptr)
-	, m_editor("TextureFinal.png", "AnimationTest.png", sf::Vector2u(6, 1), m_window)
+	, m_editor("TextureFinal2.png", "AnimationTest.png", sf::Vector2u(6, 1), m_window)
 	, m_switchDisplay(true)
 {
 }
@@ -46,15 +46,15 @@ void Application::OnInitialize()
 	m_window = new sf::RenderWindow(sf::VideoMode(1080, 720), "App");
 
 	sf::Texture animation;
-	animation.loadFromFile("AnimationTest.png");
+	animation.loadFromFile("Animation.png");
 	m_sprite.SetAnimation(animation);
 
 	sf::Texture texture;
-	texture.loadFromFile("TextureFinal.png");
+	texture.loadFromFile("Texture2.png");
 	m_sprite.SetTexture(texture);
 
 	m_sprite.SetFrameSize(sf::Vector2u(48, 48));
-	m_sprite.SetFrameNumber(sf::Vector2u(1, 1));
+	m_sprite.SetFrameNumber(sf::Vector2u(6, 1));
 	m_sprite.SetCurrentFrame(sf::Vector2u(0, 0));
 	m_sprite.SetFrameDuration(0.1f);
 

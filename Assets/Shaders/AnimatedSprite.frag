@@ -8,10 +8,5 @@ void main()
 
     vec4 finalColor = texture2D(u_texture, coord + 0.01);
 
-    // Debugging output
-    // gl_FragColor = vec4(gl_TexCoord[0].xy, 0, 1); // Visualize texture coordinates
-    // gl_FragColor = pixelCoord; // Visualize pixelCoord
-    //gl_FragColor = finalColor; // Visualize finalColor
-
     gl_FragColor = gl_Color * finalColor * vec4(1, 1, 1, pixelCoord.a);
 }
