@@ -1,0 +1,71 @@
+#pragma once
+
+#include "SFML/Graphics/Drawable.hpp"
+#include "SFML/Graphics/Transformable.hpp"
+#include "SFML/Graphics/VertexArray.hpp"
+
+namespace sf
+{
+	class Event;
+}
+
+namespace UI
+{
+	using Vec2 = sf::Vector2f;
+	using Vec2i = sf::Vector2i;
+	using Vec2u = sf::Vector2u;
+
+	class UIModule;
+
+	class UIElement
+		: public sf::Drawable
+		, public sf::Transformable
+	{
+	public:
+		UIElement();
+		virtual ~UIElement();
+
+		virtual void initialize() = 0;
+		virtual void receiveEvent(const sf::Event& _event) = 0;
+		virtual void update(float _deltaTime) = 0;
+
+		void setSize(const sf::Vector2f& _size);
+		const sf::Vector2f& getSize() const;
+
+		void setVisible(bool _visible);
+		bool isVisible() const;
+
+		void setReceiveEvents(bool _event);
+		bool isReceivingEvents() const;
+
+		void setHovered(bool _hovered);
+		bool isHovered() const;
+
+		void SetColor(const sf::Color& _color);
+
+		// Modules
+		void addModule(UIModule* _module);
+		void updateModules(float deltaTime);
+		void handleEventModules(const sf::Event& event);
+		void drawModules(sf::RenderTarget& _target, sf::RenderStates _states) const;
+
+		void removeModule(UIModule* _module);
+		void removeAllModules();
+
+	protected:
+		virtual void onSizeChanged();
+
+		virtual void updateTextureCoords(const sf::Vector2f _size);
+
+	protected:
+		sf::VertexArray m_quad;
+
+		std::vector<UIModule*> m_modules;
+
+		Vec2 m_size;
+
+		bool m_visible;
+		bool m_receiveEvents;
+		bool m_hovered;
+	};
+}

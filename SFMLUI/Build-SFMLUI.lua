@@ -1,18 +1,16 @@
-project (AppName)
-   kind "ConsoleApp"
+project "SFMLUI"
+   kind "StaticLib"
    language "C++"
    cppdialect "C++20"
    targetdir "Binaries/%{cfg.buildcfg}"
 
-   files { "Source/**.h", "Source/**.cpp", "Source/**.inl"}
+   files { "Source/**.h", "Source/**.cpp", "Source/**.inl" }
 
    defines { "SFML_STATIC", "NOMINMAX" }
 
    includedirs
    {
       "Source",
-	  "../Core/Source",
-	  "../SFMLUI/Source",
       "../Vendor/include"
    }
 
@@ -21,10 +19,8 @@ project (AppName)
 	  "../Vendor/lib"
    }
 
-   links
+   links 
    {
-	  "Core",
-	  "SFMLUI",
       "flac",
       "freetype",
       "ogg",
@@ -37,14 +33,12 @@ project (AppName)
       "gdi32.lib"
    }
 
-
-   targetdir ("../binaries/" .. OutputDir .. "/" .. AppName)
-   objdir ("../binaries/intermediates/" .. OutputDir .. "/" .. AppName)
+   targetdir ("../binaries/" .. OutputDir .. "/SFMLUI")
+   objdir ("../binaries/intermediates/" .. OutputDir .. "/SFMLUI")
    debugdir "../Assets/"
 
    filter "system:windows"
        systemversion "latest"
-       defines { "WINDOWS" }
 
    filter "configurations:Debug"
        defines { "DEBUG" }

@@ -16,7 +16,7 @@ public:
 	~Application();
 	void Run();
 
-	bool IsRunning() const;
+	bool isRunning() const;
 private:
 	void OnInitialize();
 	void OnEvent(const sf::Event& _event);
@@ -27,9 +27,10 @@ private:
 private:
 	sf::RenderWindow* m_window;
 
-	Animation::AnimatedSprite m_sprite;
-	Editor m_editor;
+	sf::Texture m_whiteTexture;
+
+	Animation::AnimatedSprite* m_sprite;
+	Animation::Editor m_editor;
 
 	bool m_switchDisplay;
 };
-

@@ -13,6 +13,8 @@ workspace (ProjectName)
 
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
+group "UI"
+	include "SFMLUI/Build-SFMLUI.lua"
 group "Core"
 	include "Core/Build-Core.lua"
 group ""

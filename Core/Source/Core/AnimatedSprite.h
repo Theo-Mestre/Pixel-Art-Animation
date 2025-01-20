@@ -3,11 +3,22 @@
 
 namespace Animation
 {
+	struct AnimationData
+	{
+		const char* AnimationName;
+		const char* TextureName;
+
+		sf::Vector2u FrameSize;
+		sf::Vector2u FrameNumber;
+		float FrameDuration;
+	};
+
 	class AnimatedSprite
 		: public sf::Drawable, public sf::Transformable
 	{
 	public:	
 		AnimatedSprite();
+		AnimatedSprite(AnimationData _data);
 		~AnimatedSprite();
 
 #pragma region Accessors

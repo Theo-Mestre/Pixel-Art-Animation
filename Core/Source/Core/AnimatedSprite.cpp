@@ -16,6 +16,35 @@ namespace Animation
 		m_shader.loadFromFile("Shaders/AnimatedSprite.vert", "Shaders/AnimatedSprite.frag");
 	}
 
+	AnimatedSprite::AnimatedSprite(AnimationData _data)
+		: m_frameSize(_data.FrameSize)
+		, m_frameNumber(_data.FrameNumber)
+		, m_frameDuration(_data.FrameDuration)
+		, m_currentFrame(0, 0)
+		, m_elapsedTime(0.0f)
+	{
+		if (!m_texture.loadFromFile(_data.TextureName))
+		{
+			std::cout << "Failed to load texture: " << _data.TextureName << std::endl;
+		}
+
+		if (!m_animation.loadFromFile(_data.AnimationName))
+		{
+			std::cout << "Failed to load texture: " << _data.AnimationName << std::endl;
+		}
+
+		m_vertices.setPrimitiveType(sf::Quads);
+		m_vertices.resize(4);
+
+		std::string vertName = "Shaders/AnimatedSprite.vert";
+		std::string fragName = "Shaders/AnimatedSprite.frag";
+
+		if (!m_shader.loadFromFile(vertName, fragName))
+		{
+			std::cout << "Failed to load shaders: " << vertName << " - " << fragName << std::endl;
+		}
+	}
+
 	AnimatedSprite::~AnimatedSprite()
 	{
 	}

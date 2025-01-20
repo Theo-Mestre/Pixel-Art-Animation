@@ -11,6 +11,7 @@ project (CoreName)
    includedirs
    {
       "Source",
+	  "../SFMLUI/Source",
       "../Vendor/include"
    }
 

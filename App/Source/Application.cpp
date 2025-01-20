@@ -1,15 +1,20 @@
 #include "corepch.h"
 #include "Application.h"
 
+#define TEX "TextureFinal2.png"
+#define ANIM "AnimationTest.png"
+#define ANIM_NUMBER 1, 1
+
 Application::Application()
 	: m_window(nullptr)
-	, m_editor("TextureFinal2.png", "AnimationTest.png", sf::Vector2u(6, 1), m_window)
+	, m_editor(TEX, ANIM, sf::Vector2u(6, 1), m_window)
 	, m_switchDisplay(true)
 {
 }
 
 Application::~Application()
 {
+
 }
 
 void Application::Run()
@@ -20,7 +25,7 @@ void Application::Run()
 
 	OnInitialize();
 
-	while (IsRunning())
+	while (isRunning())
 	{
 		deltaTime = clock.restart().asSeconds();
 
@@ -36,7 +41,7 @@ void Application::Run()
 	OnShutdown();
 }
 
-bool Application::IsRunning() const
+bool Application::isRunning() const
 {
 	return m_window && m_window->isOpen();
 }
@@ -45,30 +50,28 @@ void Application::OnInitialize()
 {
 	m_window = new sf::RenderWindow(sf::VideoMode(1080, 720), "App");
 
-	sf::Texture animation;
-	animation.loadFromFile("Animation.png");
-	m_sprite.SetAnimation(animation);
+	m_sprite = new Animation::AnimatedSprite(
+		{
+			ANIM,
+			TEX,
+			sf::Vector2u(48, 48),
+			sf::Vector2u(ANIM_NUMBER),
+			0.1f
+		}
+	);
 
-	sf::Texture texture;
-	texture.loadFromFile("Texture2.png");
-	m_sprite.SetTexture(texture);
+	m_sprite->setPosition(540.0f, 360.0f);
+	m_sprite->setOrigin(24.0f, 24.0f);
+	m_sprite->setScale(6.0f, 6.0f);
 
-	m_sprite.SetFrameSize(sf::Vector2u(48, 48));
-	m_sprite.SetFrameNumber(sf::Vector2u(6, 1));
-	m_sprite.SetCurrentFrame(sf::Vector2u(0, 0));
-	m_sprite.SetFrameDuration(0.1f);
-
-	m_sprite.setPosition(540.0f, 360.0f);
-	m_sprite.setOrigin(24.0f, 24.0f);
-	m_sprite.setScale(6.0f, 6.0f);
-
-	m_editor.SetWindow(m_window);
-	m_editor.OnInitialize();
+	m_editor.setData({ m_window });
+	m_editor.initialize();
 }
 
 void Application::OnEvent(const sf::Event& _event)
 {
 	if (_event.type == sf::Event::Closed) m_window->close();
+
 	if (_event.type == sf::Event::KeyPressed)
 	{
 		if (_event.key.code == sf::Keyboard::Tab)
@@ -76,9 +79,10 @@ void Application::OnEvent(const sf::Event& _event)
 			m_switchDisplay = !m_switchDisplay;
 		}
 	}
+
 	if (m_switchDisplay)
 	{
-		m_editor.OnEvent(_event);
+		m_editor.receiveEvent(_event);
 	}
 }
 
@@ -86,11 +90,11 @@ void Application::OnUpdate(float _deltaTime)
 {
 	if (m_switchDisplay)
 	{
-		m_editor.OnUpdate(_deltaTime);
+		m_editor.update(_deltaTime);
 	}
-	else 
+	else
 	{
-		m_sprite.Update(_deltaTime);
+		m_sprite->Update(_deltaTime);
 	}
 }
 
@@ -98,11 +102,11 @@ void Application::OnRender()
 {
 	if (m_switchDisplay)
 	{
-		m_editor.OnRender();
+		m_editor.draw();
 	}
 	else
 	{
-		m_window->draw(m_sprite);
+		m_window->draw(*m_sprite);
 	}
 }
 
