@@ -68,7 +68,7 @@ namespace UI
 		return m_hovered;
 	}
 
-	void UIElement::SetColor(const sf::Color& _color)
+	void UIElement::setColor(const sf::Color& _color)
 	{
 		for (int i = 0; i < 4; i++)
 		{

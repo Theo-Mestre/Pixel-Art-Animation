@@ -33,14 +33,8 @@ namespace UI
 		virtual void draw(sf::RenderTarget& _target, sf::RenderStates _states) const override;
 
 		virtual void onSizeChanged() override;
-	private:
+	protected:
 		UIElementContainer m_children;
-
-	public:
-		// Panel shouldn't have a scale, use setSize instead
-		void setScale(float _x, float _y) = delete;
-		// Panel shouldn't have a scale, use setSize instead
-		void setScale(const sf::Vector2f& _scale) = delete;
 	};
 
 }

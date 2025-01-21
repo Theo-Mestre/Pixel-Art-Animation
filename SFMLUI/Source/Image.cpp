@@ -1,23 +1,38 @@
+#include <iostream>
+
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Glsl.hpp>
 
 #include "Image.h"
 
 namespace UI
 {
+	static sf::Shader s_shader;
+	static const const char* s_shaderVertName = "Shaders/Image.vert";
+	static const const char* s_shaderFragName = "Shaders/Image.frag";
+
 	Image::Image()
 		: UIElement()
 		, m_texture(nullptr)
 		, m_textureRect()
+		, m_clearColor(sf::Color::Transparent)
 	{
 	}
 
 	Image::~Image()
 	{
+		delete m_texture;
 		m_texture = nullptr;
 	}
 
 	void Image::initialize()
 	{
+		if (s_shader.getNativeHandle() != 0) return;
+
+		if (!s_shader.loadFromFile(s_shaderVertName, s_shaderFragName))
+		{
+			std::cout << "Failed to load shader" << std::endl;
+		}
 	}
 
 	void Image::receiveEvent(const sf::Event& _event)
@@ -30,14 +45,25 @@ namespace UI
 		if (!isVisible()) return;
 	}
 
-	void Image::setImage(sf::Texture& _texture)
+	void Image::setTexture(sf::Texture* _texture)
 	{
-		m_texture = &_texture;
+		if (!_texture) return;
+
+		if (m_texture)
+		{
+			delete m_texture;
+		}
+
+		m_texture = _texture;
+
+		setTextureRect(sf::IntRect(0, 0, m_texture->getSize().x, m_texture->getSize().y));
 	}
 
 	void Image::setTextureRect(const sf::IntRect& _rect)
 	{
 		m_textureRect = _rect;
+
+		updateTextureRect();
 	}
 
 	void Image::setColor(const sf::Color& _color)
@@ -48,18 +74,41 @@ namespace UI
 		}
 	}
 
+	void Image::setClearColor(const sf::Color& _color)
+	{
+		m_clearColor = _color;
+	}
+
 	void Image::draw(sf::RenderTarget& _target, sf::RenderStates _states) const
 	{
 		if (!isVisible()) return;
 
+		// Check texture state
 		if (m_texture)
 		{
 			_states.texture = m_texture;
 		}
 
+		// Check shader state
+		if (s_shader.getNativeHandle() != 0)
+		{
+			s_shader.setUniform("u_texture", sf::Shader::CurrentTexture);
+			s_shader.setUniform("u_clearColor", sf::Glsl::Vec4(m_clearColor));
+			_states.shader = &s_shader;
+		}
+
 		_states.transform *= getTransform();
 		_target.draw(m_quad, _states);
 	}
+
+	void Image::onSizeChanged()
+	{
+		m_quad[0].position = sf::Vector2f(0.0f, 0.0f);
+		m_quad[1].position = sf::Vector2f(m_size.x, 0.0f);
+		m_quad[2].position = m_size;
+		m_quad[3].position = sf::Vector2f(0.0f, m_size.y);
+	}
+
 	void Image::updateTextureRect()
 	{
 		m_quad[0].texCoords = sf::Vector2f(m_textureRect.left, m_textureRect.top);

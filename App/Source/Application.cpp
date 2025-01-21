@@ -1,13 +1,17 @@
 #include "corepch.h"
+
+#include "UIElement.h"
+
 #include "Application.h"
 
-#define TEX "TextureFinal2.png"
-#define ANIM "AnimationTest.png"
-#define ANIM_NUMBER 1, 1
+constexpr const char* TEXTURE_PATH = "Texture.png";
+constexpr const char* ANIMATION_PATH = "Animation.png";
+constexpr uint32_t ANIM_COUNT_X = 1;
+constexpr uint32_t ANIM_COUNT_Y = 1;
 
 Application::Application()
 	: m_window(nullptr)
-	, m_editor(TEX, ANIM, sf::Vector2u(6, 1), m_window)
+	, m_editor()
 	, m_switchDisplay(true)
 {
 }
@@ -50,22 +54,29 @@ void Application::OnInitialize()
 {
 	m_window = new sf::RenderWindow(sf::VideoMode(1080, 720), "App");
 
-	m_sprite = new Animation::AnimatedSprite(
-		{
-			ANIM,
-			TEX,
-			sf::Vector2u(48, 48),
-			sf::Vector2u(ANIM_NUMBER),
-			0.1f
-		}
-	);
+	Animation::EditorData editorData;
+	editorData.Window = m_window;
+	editorData.AnimationCount = { ANIM_COUNT_X, ANIM_COUNT_Y };
+	editorData.AnimationPath = ANIMATION_PATH;
+	editorData.TexturePath = TEXTURE_PATH;
 
-	m_sprite->setPosition(540.0f, 360.0f);
-	m_sprite->setOrigin(24.0f, 24.0f);
-	m_sprite->setScale(6.0f, 6.0f);
-
-	m_editor.setData({ m_window });
+	m_editor.setData(editorData);
 	m_editor.initialize();
+
+	//m_sprite = new Animation::AnimatedSprite(
+	//	{
+	//		ANIM,
+	//		TEX,
+	//		sf::Vector2u(48, 48),
+	//		sf::Vector2u(ANIM_NUMBER),
+	//		0.1f
+	//	}
+	//);
+	//
+	//m_sprite->setPosition(540.0f, 360.0f);
+	//m_sprite->setOrigin(24.0f, 24.0f);
+	//m_sprite->setScale(6.0f, 6.0f);
+
 }
 
 void Application::OnEvent(const sf::Event& _event)
@@ -94,7 +105,7 @@ void Application::OnUpdate(float _deltaTime)
 	}
 	else
 	{
-		m_sprite->Update(_deltaTime);
+		//m_sprite->Update(_deltaTime);
 	}
 }
 
@@ -106,7 +117,7 @@ void Application::OnRender()
 	}
 	else
 	{
-		m_window->draw(*m_sprite);
+		//m_window->draw(*m_sprite);
 	}
 }
 

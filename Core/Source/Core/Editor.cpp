@@ -1,6 +1,8 @@
 #include "corepch.h"
 
 #include "Button.h"
+#include "Image.h"
+#include "PanelRenderer.h"
 #include "Modules.h"
 
 #include "Editor.h"
@@ -8,33 +10,23 @@
 namespace Animation
 {
 	Editor::Editor(const EditorData& _editorData)
-		: m_editorData(_editorData)
-	{
-	}
-
-	Editor::Editor(const std::string& _texturePath,
-		const std::string& _animationPath,
-		sf::Vector2u _animationSize,
-		sf::RenderWindow* _window)
-		: m_editorData({ _window })
-		, m_animationCount(_animationSize)
+		: m_data(_editorData)
 	{
 	}
 
 	Editor::~Editor()
 	{
-		m_editorData.Window = nullptr;
+		m_data.Window = nullptr;
 
-		m_animationPanel = nullptr;
 		m_functionPanel = nullptr;
+		m_animationPanel = nullptr;
 	}
 
 	void Editor::initialize()
 	{
-		m_windowSize = (UI::Vec2)m_editorData.Window->getSize();
-		m_padding = 10.0f;
+		m_windowSize = (UI::Vec2)m_data.Window->getSize();
 
-		initializePanels();
+		initializeUI();
 	}
 
 	void Editor::receiveEvent(const sf::Event& _event)
@@ -57,12 +49,12 @@ namespace Animation
 
 	void Editor::draw()
 	{
-		m_editorData.Window->draw(m_editorPanel);
+		m_data.Window->draw(m_editorPanel);
 	}
 
 	void Editor::setData(const EditorData& _editorData)
 	{
-		m_editorData = _editorData;
+		m_data = _editorData;
 	}
 
 	sf::Vector2f Editor::normalizeCoordinates(sf::Vector2i _coord)
@@ -70,19 +62,20 @@ namespace Animation
 		return  UI::Vec2((float)_coord.x / (float)m_textureSize.x, (float)_coord.y / (float)m_textureSize.y);
 	}
 
-	void Editor::initializePanels()
+	void Editor::initializeUI()
 	{
 		m_font.loadFromFile("Fonts/Font.otf");
 
 		m_editorPanel.initialize();
 
 		m_editorPanel.setSize(m_windowSize);
-		m_editorPanel.SetColor(sf::Color(20, 20, 20, 255));
+		m_editorPanel.setColor(sf::Color(20, 20, 20, 255));
 
 		initializeFunctionPanel();
 		initializeFunctionButtons();
 
 		initializeAnimationPanel();
+		initializeAnimationImages();
 	}
 
 	void Editor::initializeFunctionPanel()
@@ -96,7 +89,7 @@ namespace Animation
 		sf::Vector2f panelSize = sf::Vector2f(m_windowSize.x - padding, functionPanelHeight - padding);
 		m_functionPanel->setSize(panelSize);
 		m_functionPanel->setPosition(sf::Vector2f(m_padding, m_padding));
-		m_functionPanel->SetColor(sf::Color(50, 50, 50, 255));
+		m_functionPanel->setColor(sf::Color(50, 50, 50, 255));
 
 		m_editorPanel.addChild(m_functionPanel);
 	}
@@ -141,14 +134,57 @@ namespace Animation
 		const float padding = 2.0f * m_padding;
 		const UI::Vec2 functionPanelSize = m_functionPanel->getSize();
 		const UI::Vec2 functionTotalSize = m_functionPanel->getSize() + UI::Vec2(padding, padding);
-		const UI::Vec2 panelSize(m_windowSize.x - padding, m_windowSize.y - functionTotalSize.y - padding);
+		const UI::Vec2 panelSize(m_windowSize.x - padding, m_windowSize.y - functionTotalSize.y - m_padding);
 
 		m_animationPanel = new UI::Panel();
 		m_animationPanel->initialize();
 		m_animationPanel->setSize(panelSize);
 		m_animationPanel->setPosition(UI::Vec2(m_padding, functionPanelSize.y + padding));
-		m_animationPanel->SetColor(sf::Color(50, 50, 50, 255));
+		m_animationPanel->setColor(sf::Color(50, 50, 50, 255));
 
 		m_editorPanel.addChild(m_animationPanel);
+	}
+
+	void Editor::initializeAnimationImages()
+	{
+		UI::Vec2 padding = UI::Vec2(m_imagePadding, m_imagePadding);
+		float imageSize = (m_animationPanel->getSize().x / 2.0f) - padding.x * 1.5f;
+
+		auto animationTexture = new sf::Texture();
+		auto texTexture = new sf::Texture();
+
+		if (!animationTexture->loadFromFile(m_data.AnimationPath))
+		{
+			std::cout << "Failed to load texture: " << m_data.AnimationPath << std::endl;
+		}
+
+		if (!texTexture->loadFromFile(m_data.TexturePath))
+		{
+			std::cout << "Failed to load texture: " << m_data.TexturePath << std::endl;
+		}
+
+		m_animationImageUI = new UI::Image();
+		m_animationImageUI->initialize();
+		m_animationImageUI->setTexture(animationTexture);
+		m_animationImageUI->setSize(UI::Vec2(imageSize, imageSize));
+		m_animationImageUI->setPosition(padding);
+		m_animationImageUI->setClearColor(sf::Color(20, 20, 20, 255));
+
+		m_animationPanel->addChild(m_animationImageUI);
+
+		m_textureImageUI = new UI::Image();
+		m_textureImageUI->initialize();
+		m_textureImageUI->setTexture(texTexture);
+		m_textureImageUI->setSize(UI::Vec2(imageSize, imageSize));
+		m_textureImageUI->setOrigin(UI::Vec2(imageSize, 0.0f));
+		m_textureImageUI->setPosition(UI::Vec2(m_animationPanel->getSize().x - padding.x, padding.y));
+		m_textureImageUI->setClearColor(sf::Color(20, 20, 20, 255));
+
+		m_animationPanel->addChild(m_textureImageUI);
+	}
+	
+	void Editor::initializePreviewPanel()
+	{
+		m_previewPanel = new UI::PanelRendered();
 	}
 }

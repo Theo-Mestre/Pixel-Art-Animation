@@ -41,7 +41,7 @@ namespace UI
 		void setHovered(bool _hovered);
 		bool isHovered() const;
 
-		void SetColor(const sf::Color& _color);
+		void setColor(const sf::Color& _color);
 
 		// Modules
 		void addModule(UIModule* _module);
