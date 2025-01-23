@@ -38,11 +38,15 @@ namespace UI
 	void Image::receiveEvent(const sf::Event& _event)
 	{
 		if (!isReceivingEvents()) return;
+
+		handleEventModules(_event);
 	}
 
 	void Image::update(float _deltaTime)
 	{
 		if (!isVisible()) return;
+
+		updateModules(_deltaTime);
 	}
 
 	void Image::setTexture(sf::Texture* _texture)
@@ -99,6 +103,8 @@ namespace UI
 
 		_states.transform *= getTransform();
 		_target.draw(m_quad, _states);
+
+		drawModules(_target, _states);
 	}
 
 	void Image::onSizeChanged()

@@ -17,12 +17,23 @@ namespace Animation
 	}
 
 	AnimatedSprite::AnimatedSprite(AnimationData _data)
-		: m_frameSize(_data.FrameSize)
-		, m_frameNumber(_data.FrameNumber)
+		: m_frameNumber(_data.FrameNumber)
 		, m_frameDuration(_data.FrameDuration)
 		, m_currentFrame(0, 0)
 		, m_elapsedTime(0.0f)
 	{
+		initialize(_data);
+	}
+
+	AnimatedSprite::~AnimatedSprite()
+	{
+	}
+
+	void AnimatedSprite::initialize(AnimationData _data)
+	{
+		m_frameNumber = _data.FrameNumber;
+		m_frameDuration = _data.FrameDuration;
+
 		if (!m_texture.loadFromFile(_data.TextureName))
 		{
 			std::cout << "Failed to load texture: " << _data.TextureName << std::endl;
@@ -33,11 +44,15 @@ namespace Animation
 			std::cout << "Failed to load texture: " << _data.AnimationName << std::endl;
 		}
 
+		auto texSize = m_animation.getSize();
+		m_frameSize.x = texSize.x / m_frameNumber.x;
+		m_frameSize.y = texSize.y / m_frameNumber.y;
+
 		m_vertices.setPrimitiveType(sf::Quads);
 		m_vertices.resize(4);
 
-		std::string vertName = "Shaders/AnimatedSprite.vert";
-		std::string fragName = "Shaders/AnimatedSprite.frag";
+		const std::string vertName = "Shaders/AnimatedSprite.vert";
+		const std::string fragName = "Shaders/AnimatedSprite.frag";
 
 		if (!m_shader.loadFromFile(vertName, fragName))
 		{
@@ -45,11 +60,7 @@ namespace Animation
 		}
 	}
 
-	AnimatedSprite::~AnimatedSprite()
-	{
-	}
-
-	void AnimatedSprite::Update(float _deltaTime)
+	void AnimatedSprite::update(float _deltaTime)
 	{
 		m_elapsedTime += _deltaTime;
 		if (m_elapsedTime >= m_frameDuration)

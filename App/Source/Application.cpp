@@ -4,7 +4,7 @@
 
 #include "Application.h"
 
-constexpr const char* TEXTURE_PATH = "Texture.png";
+constexpr const char* TEXTURE_PATH = "Texture2.png";
 constexpr const char* ANIMATION_PATH = "Animation.png";
 constexpr uint32_t ANIM_COUNT_X = 1;
 constexpr uint32_t ANIM_COUNT_Y = 1;
@@ -65,10 +65,9 @@ void Application::OnInitialize()
 
 	//m_sprite = new Animation::AnimatedSprite(
 	//	{
-	//		ANIM,
-	//		TEX,
-	//		sf::Vector2u(48, 48),
-	//		sf::Vector2u(ANIM_NUMBER),
+	//		ANIMATION_PATH,
+	//		TEXTURE_PATH,
+	//		sf::Vector2u(ANIM_COUNT_X, ANIM_COUNT_Y),
 	//		0.1f
 	//	}
 	//);
@@ -105,7 +104,7 @@ void Application::OnUpdate(float _deltaTime)
 	}
 	else
 	{
-		//m_sprite->Update(_deltaTime);
+		//m_sprite->update(_deltaTime);
 	}
 }
 

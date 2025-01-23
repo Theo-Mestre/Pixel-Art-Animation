@@ -5,12 +5,12 @@
 
 namespace UI
 {
-	void UIModule::receiveEvent(const sf::Event& _event)
+	void Module::receiveEvent(const sf::Event& _event)
 	{
 	}
 
 	TextModule::TextModule()
-		: UIModule()
+		: Module()
 	{
 		setColor(sf::Color::Black);
 	}

@@ -15,7 +15,7 @@ namespace UI
 	using Vec2i = sf::Vector2i;
 	using Vec2u = sf::Vector2u;
 
-	class UIModule;
+	class Module;
 
 	class UIElement
 		: public sf::Drawable
@@ -44,12 +44,12 @@ namespace UI
 		void setColor(const sf::Color& _color);
 
 		// Modules
-		void addModule(UIModule* _module);
+		void addModule(Module* _module);
 		void updateModules(float deltaTime);
 		void handleEventModules(const sf::Event& event);
 		void drawModules(sf::RenderTarget& _target, sf::RenderStates _states) const;
 
-		void removeModule(UIModule* _module);
+		void removeModule(Module* _module);
 		void removeAllModules();
 
 	protected:
@@ -60,7 +60,7 @@ namespace UI
 	protected:
 		sf::VertexArray m_quad;
 
-		std::vector<UIModule*> m_modules;
+		std::vector<Module*> m_modules;
 
 		Vec2 m_size;
 

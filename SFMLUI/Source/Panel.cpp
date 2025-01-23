@@ -21,7 +21,6 @@ namespace UI
 				delete child;
 			}
 		}
-
 		m_children.clear();
 	}
 

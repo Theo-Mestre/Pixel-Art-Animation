@@ -15,12 +15,12 @@ namespace UI
 
 	PanelRenderer::~PanelRenderer()
 	{
+		m_renderTexture.clear();
 	}
 
 	void PanelRenderer::initialize()
 	{
 		Panel::initialize();
-		m_renderTexture.create((uint32_t)m_size.x, (uint32_t)m_size.y);
 	}
 
 	void PanelRenderer::receiveEvent(const sf::Event& _event)
@@ -46,26 +46,32 @@ namespace UI
 	void PanelRenderer::draw(sf::RenderTarget& _target, sf::RenderStates _states) const
 	{
 		if (!isVisible()) return;
+		
+		// TODO: Change this to avoid const_cast
+		const_cast<PanelRenderer*>(this)->renderChildrenOnTexture(_states);
 
-		//TODO Change Draw to avoid Const Cast
+		const sf::Texture& texture = m_renderTexture.getTexture();
 
-		const_cast<sf::RenderTexture&>(m_renderTexture).clear(m_clearColor);
+		_states.transform *= getTransform();
+		_states.texture = &texture;
+		_target.draw(m_quad, _states);
+	}
+
+	void PanelRenderer::renderChildrenOnTexture(sf::RenderStates _states)
+	{
+		m_renderTexture.clear(m_clearColor);
 
 		for (auto& [child, ownership] : m_children)
 		{
 			if (child->isVisible())
 			{
-				//m_renderTexture.draw(const_cast<UIElement&>(*child), _states);
+				m_renderTexture.draw(*child, _states);
 			}
 		}
 
-		const_cast<sf::RenderTexture&>(m_renderTexture).display();
+		drawModules(m_renderTexture, _states);
 
-		const sf::Texture& texture = m_renderTexture.getTexture();
-		
-		_states.transform *= getTransform();
-		_states.texture = &texture;
-		_target.draw(m_quad, _states);
+		m_renderTexture.display();
 	}
 
 	void PanelRenderer::onSizeChanged()
@@ -76,5 +82,7 @@ namespace UI
 		m_quad[3].position = sf::Vector2f(0.0f, m_size.y);
 
 		m_renderTexture.create((uint32_t)m_size.x, (uint32_t)m_size.y);
+
+		updateTextureCoords(m_size);
 	}
 }

@@ -55,7 +55,7 @@ namespace UI
 
 	bool UIElement::isReceivingEvents() const
 	{
-		return m_receiveEvents && m_visible;
+		return m_receiveEvents && isVisible();
 	}
 
 	void UIElement::setHovered(bool _hovered)
@@ -76,7 +76,7 @@ namespace UI
 		}
 	}
 
-	void UIElement::addModule(UIModule* _module)
+	void UIElement::addModule(Module* _module)
 	{
 		_module->m_owner = this;
 		m_modules.push_back(std::move(_module));
@@ -106,7 +106,7 @@ namespace UI
 		}
 	}
 
-	void UIElement::removeModule(UIModule* _module)
+	void UIElement::removeModule(Module* _module)
 	{
 		auto it = std::find(m_modules.begin(), m_modules.end(), _module);
 

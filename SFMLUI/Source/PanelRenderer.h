@@ -3,7 +3,6 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Color.hpp>
 
-#include "UIElement.h"
 #include "Panel.h"
 
 namespace UI
@@ -24,6 +23,7 @@ namespace UI
 		sf::RenderTarget& operator()();
 	private:
 		virtual void draw(sf::RenderTarget& _target, sf::RenderStates _states) const override;
+		void renderChildrenOnTexture(sf::RenderStates _states);
 
 		virtual void onSizeChanged() override;
 	private:

@@ -36,7 +36,6 @@ namespace UI
 		// return if the event isn't a mouse button press
 		if (_event.type != sf::Event::MouseButtonPressed) return;
 
-
 		// Check if the button was pressed
 		if (_event.mouseButton.button == sf::Mouse::Left)
 		{

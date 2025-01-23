@@ -12,15 +12,17 @@ namespace UI
 {
 	class Button;
 	class Image;
-	class PanelRendered;
+	class PanelRenderer;
 }
 
 namespace Animation
 {
+	class AnimatedSpriteModule;
+
 	// Contains the data needed to initialize and use the Editor
 	struct EditorData
 	{
-		sf::RenderWindow* Window;
+		sf::RenderWindow* Window = nullptr;
 
 		// Animation Data
 		UI::Vec2u AnimationCount;
@@ -57,6 +59,8 @@ namespace Animation
 
 		void initializePreviewPanel();
 	private:
+		AnimatedSpriteModule* m_spriteModule;
+
 		EditorData m_data;
 		UI::Vec2 m_windowSize;
 
@@ -74,18 +78,24 @@ namespace Animation
 		UI::Panel m_editorPanel;
 		UI::Panel* m_functionPanel = nullptr;
 		UI::Panel* m_animationPanel = nullptr;
-		UI::PanelRendered* m_previewPanel = nullptr;
+		UI::PanelRenderer* m_previewPanel = nullptr;
+
 		// PanelSettings
 		float m_functionPanelHeightInPercent = 20.0f;
 
+		// Images 
 		UI::Image* m_animationImageUI = nullptr;
 		UI::Image* m_textureImageUI = nullptr;
+
 		// ImageSettings
 		float m_imagePadding = 10.0f;
 
 		// LayoutSettings
 		float m_padding = 10.0f;
 
+		// StyelSettings
 		sf::Font m_font;
+		const sf::Color m_backgroundClearColor = sf::Color(20, 20, 20, 255);
+		const sf::Color m_panelClearColor = sf::Color(50, 50, 50, 255);
 	};
 }

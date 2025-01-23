@@ -8,7 +8,6 @@ namespace Animation
 		const char* AnimationName;
 		const char* TextureName;
 
-		sf::Vector2u FrameSize;
 		sf::Vector2u FrameNumber;
 		float FrameDuration;
 	};
@@ -43,7 +42,8 @@ namespace Animation
 		inline float GetElapsedTime() const { return m_elapsedTime; }
 #pragma endregion
 
-		void Update(float _deltaTime);
+		void initialize(AnimationData _data);
+		void update(float _deltaTime);
 
 	private:
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "SFML/Graphics/VertexArray.hpp"
-
 #include "UIElement.h"
 
 namespace UI
@@ -36,5 +34,4 @@ namespace UI
 	protected:
 		UIElementContainer m_children;
 	};
-
 }
