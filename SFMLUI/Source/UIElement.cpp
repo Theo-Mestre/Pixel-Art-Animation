@@ -133,9 +133,9 @@ namespace UI
 
 	void UIElement::updateTextureCoords(const sf::Vector2f _size)
 	{
-		m_quad[0].texCoords = sf::Vector2f(0.0f, 0.0f);
-		m_quad[1].texCoords = sf::Vector2f(_size.x, 0.0f);
+		m_quad[0].texCoords = Vec2(0.0f, 0.0f);
+		m_quad[1].texCoords = Vec2(_size.x, 0.0f);
 		m_quad[2].texCoords = _size;
-		m_quad[3].texCoords = sf::Vector2f(0.0f, _size.y);
+		m_quad[3].texCoords = Vec2(0.0f, _size.y);
 	}
 }

@@ -26,7 +26,7 @@ namespace UI
 		virtual void onSizeChanged() override;
 
 	private:
-		bool contains(const sf::Vector2f& _point) const;
+		bool contains(const Vec2& _point) const;
 
 		virtual void draw(sf::RenderTarget& _target, sf::RenderStates _states) const override;
 	private:

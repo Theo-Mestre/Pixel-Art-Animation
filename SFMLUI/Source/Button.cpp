@@ -29,7 +29,7 @@ namespace UI
 		// Check hover state
 		if (_event.type == sf::Event::MouseMoved)
 		{
-			sf::Vector2f mousePos = sf::Vector2f(_event.mouseMove.x, _event.mouseMove.y);
+			Vec2 mousePos = Vec2(_event.mouseMove.x, _event.mouseMove.y);
 			m_hovered = contains(mousePos);
 		}
 
@@ -64,17 +64,17 @@ namespace UI
 
 		m_texture = _texture;
 
-		updateTextureCoords((sf::Vector2f)m_texture->getSize());
+		updateTextureCoords((Vec2)m_texture->getSize());
 	}
 
 	void Button::onSizeChanged()
 	{
-		m_quad[1].position = sf::Vector2f(m_size.x, 0.0f);
-		m_quad[2].position = sf::Vector2f(m_size.x, m_size.y);
-		m_quad[3].position = sf::Vector2f(0.0f, m_size.y);
+		m_quad[1].position = Vec2(m_size.x, 0.0f);
+		m_quad[2].position = Vec2(m_size.x, m_size.y);
+		m_quad[3].position = Vec2(0.0f, m_size.y);
 	}
 
-	bool Button::contains(const sf::Vector2f& _point) const
+	bool Button::contains(const Vec2& _point) const
 	{
 		sf::FloatRect rect = getTransform().transformRect(m_quad.getBounds());
 		return rect.contains(_point);

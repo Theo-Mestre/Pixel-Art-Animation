@@ -8,8 +8,8 @@
 namespace UI
 {
 	static sf::Shader s_shader;
-	static const const char* s_shaderVertName = "Shaders/Image.vert";
-	static const const char* s_shaderFragName = "Shaders/Image.frag";
+	static const char* s_shaderVertName = "Shaders/Image.vert";
+	static const char* s_shaderFragName = "Shaders/Image.frag";
 
 	Image::Image()
 		: UIElement()
@@ -119,17 +119,17 @@ namespace UI
 
 	void Image::onSizeChanged()
 	{
-		m_quad[0].position = sf::Vector2f(0.0f, 0.0f);
-		m_quad[1].position = sf::Vector2f(m_size.x, 0.0f);
+		m_quad[0].position = Vec2(0.0f, 0.0f);
+		m_quad[1].position = Vec2(m_size.x, 0.0f);
 		m_quad[2].position = m_size;
-		m_quad[3].position = sf::Vector2f(0.0f, m_size.y);
+		m_quad[3].position = Vec2(0.0f, m_size.y);
 	}
 
 	void Image::updateTextureRect()
 	{
-		m_quad[0].texCoords = sf::Vector2f(m_textureRect.left, m_textureRect.top);
-		m_quad[1].texCoords = sf::Vector2f(m_textureRect.left + m_textureRect.width, m_textureRect.top);
-		m_quad[2].texCoords = sf::Vector2f(m_textureRect.left + m_textureRect.width, m_textureRect.top + m_textureRect.height);
-		m_quad[3].texCoords = sf::Vector2f(m_textureRect.left, m_textureRect.top + m_textureRect.height);
+		m_quad[0].texCoords = Vec2(m_textureRect.left, m_textureRect.top);
+		m_quad[1].texCoords = Vec2(m_textureRect.left + m_textureRect.width, m_textureRect.top);
+		m_quad[2].texCoords = Vec2(m_textureRect.left + m_textureRect.width, m_textureRect.top + m_textureRect.height);
+		m_quad[3].texCoords = Vec2(m_textureRect.left, m_textureRect.top + m_textureRect.height);
 	}
 }

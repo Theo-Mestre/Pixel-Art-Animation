@@ -77,9 +77,9 @@ namespace UI
 	void PanelRenderer::onSizeChanged()
 	{
 		// m_quad[0] = 0.0f, 0.0f. Never changes so no need to update
-		m_quad[1].position = sf::Vector2f(m_size.x, 0.0f);
-		m_quad[2].position = sf::Vector2f(m_size.x, m_size.y);
-		m_quad[3].position = sf::Vector2f(0.0f, m_size.y);
+		m_quad[1].position = Vec2(m_size.x, 0.0f);
+		m_quad[2].position = Vec2(m_size.x, m_size.y);
+		m_quad[3].position = Vec2(0.0f, m_size.y);
 
 		m_renderTexture.create((uint32_t)m_size.x, (uint32_t)m_size.y);
 

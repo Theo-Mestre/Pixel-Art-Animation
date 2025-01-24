@@ -6,6 +6,7 @@
 #include "Modules.h"
 
 #include "AnimatedSpriteModule.h"
+#include "MousePickerModule.h"
 #include "Editor.h"
 
 namespace Animation
@@ -33,14 +34,6 @@ namespace Animation
 
 	void Editor::receiveEvent(const sf::Event& _event)
 	{
-		if (_event.type == sf::Event::KeyPressed)
-		{
-			if (_event.key.code == sf::Keyboard::Space)
-			{
-				//m_animationImage.saveToFile(m_data.AnimationPath);
-			}
-		}
-
 		m_editorPanel.receiveEvent(_event);
 	}
 
@@ -74,17 +67,33 @@ namespace Animation
 		std::cout << (status ? "Animation saved successfully" : "Failed to save animation") << std::endl;
 	}
 
+	void Editor::processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker)
+	{
+		std::string targetName = _selectedImage == SelectedImage::Animation ? "Animation" : "Texture";
+
+		if (_picker->isSelected())
+		{
+			std::cout << targetName << " selected at: " << _picker->getSelectedPosition() << std::endl;
+		}
+		else
+		{
+			std::cout << targetName << " deselected" << std::endl;
+		}
+	}
+
 	void Editor::updateImageData()
 	{
 		auto animationTexture = m_animationImageUI->getTexture();
 		if (animationTexture == nullptr) return;
 
+		// Create the image if it doesn't exist or the size is different from the texture
 		if (animationTexture->getSize() != m_animationImage.getSize())
 		{
 			m_animationImage.create(animationTexture->getSize().x, animationTexture->getSize().y, sf::Color::Transparent);
 			m_animationImage.copy(animationTexture->copyToImage(), 0, 0);
 		}
 
+		// Update the texture with the new image
 		animationTexture->update(m_animationImage);
 	}
 
@@ -98,26 +107,29 @@ namespace Animation
 		m_editorPanel.setSize(m_windowSize);
 		m_editorPanel.setColor(m_backgroundClearColor);
 
+		// Initialize the function panel
 		initializeFunctionPanel();
 		initializeFunctionButtons();
 
+		// Initialize the animation panel
 		initializeAnimationPanel();
 		initializeAnimationImages();
 
+		// Initialize the preview panel
 		initializePreviewPanel();
 	}
 
 	void Editor::initializeFunctionPanel()
 	{
-		m_functionPanel = new UI::Panel();
-		m_functionPanel->initialize();
-
 		float functionPanelHeight = m_windowSize.y * m_functionPanelHeightInPercent * 0.01f;
 		float padding = m_padding * 2.0f;
+		UI::Vec2 panelSize = UI::Vec2(m_windowSize.x - padding, functionPanelHeight - padding);
 
-		sf::Vector2f panelSize = sf::Vector2f(m_windowSize.x - padding, functionPanelHeight - padding);
+
+		m_functionPanel = new UI::Panel();
+		m_functionPanel->initialize();
 		m_functionPanel->setSize(panelSize);
-		m_functionPanel->setPosition(sf::Vector2f(m_padding, m_padding));
+		m_functionPanel->setPosition(UI::Vec2(m_padding, m_padding));
 		m_functionPanel->setColor(m_panelClearColor);
 
 		m_editorPanel.addChild(m_functionPanel);
@@ -181,39 +193,48 @@ namespace Animation
 	void Editor::initializeAnimationImages()
 	{
 		UI::Vec2 padding = UI::Vec2(m_imagePadding, m_imagePadding);
-		float imageSize = (m_animationPanel->getSize().x / 2.0f) - padding.x * 1.5f;
 
-		auto animationTexture = new sf::Texture();
-		auto texTexture = new sf::Texture();
+		float imageWidth = m_animationPanel->getSize().x / 2.0f - 1.5f * padding.x;
+		UI::Vec2 imageSize(imageWidth, imageWidth);
 
-		if (!animationTexture->loadFromFile(m_data.AnimationPath))
+		// Create the animation image
+		UI::Vec2 animationPosition = padding;
+		createAnimationImage(m_animationImageUI, m_data.AnimationPath, animationPosition, imageSize, [this](UI::MousePickerModule* _picker)
+			{
+				processSelectedPosition(SelectedImage::Animation, _picker);
+			});
+
+		// Create the texture image
+		UI::Vec2 texturePosition((m_animationPanel->getSize().x + padding.x) * 0.5f, padding.y);
+		createAnimationImage(m_textureImageUI, m_data.TexturePath, texturePosition, imageSize, [this](UI::MousePickerModule* _picker)
+			{
+				processSelectedPosition(SelectedImage::Texture, _picker);
+			});
+	}
+
+	void Editor::createAnimationImage(UI::Image* _target, const std::string& _texPath, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback)
+	{
+		auto texture = new sf::Texture();
+		if (!texture->loadFromFile(_texPath))
 		{
-			std::cout << "Failed to load texture: " << m_data.AnimationPath << std::endl;
+			std::cout << "Failed to load texture: " << _texPath << std::endl;
 		}
 
-		if (!texTexture->loadFromFile(m_data.TexturePath))
-		{
-			std::cout << "Failed to load texture: " << m_data.TexturePath << std::endl;
-		}
+		_target = new UI::Image();
+		_target->initialize();
+		_target->setTexture(texture);
+		_target->setPosition(_position);
+		_target->setSize(_size);
+		_target->setClearColor(m_backgroundClearColor);
 
-		m_animationImageUI = new UI::Image();
-		m_animationImageUI->initialize();
-		m_animationImageUI->setTexture(animationTexture);
-		m_animationImageUI->setSize(UI::Vec2(imageSize, imageSize));
-		m_animationImageUI->setPosition(padding);
-		m_animationImageUI->setClearColor(m_backgroundClearColor);
+		UI::MousePickerModule* animationPicker = new UI::MousePickerModule();
+		_target->addModule(animationPicker);
 
-		m_animationPanel->addChild(m_animationImageUI);
+		UI::PickingZone pickingZone(_position + m_animationPanel->getPosition(), _size);
+		animationPicker->setPickingZone(pickingZone);
+		animationPicker->SetSelectionCallback(std::bind(_callback, animationPicker));	
 
-		m_textureImageUI = new UI::Image();
-		m_textureImageUI->initialize();
-		m_textureImageUI->setTexture(texTexture);
-		m_textureImageUI->setSize(UI::Vec2(imageSize, imageSize));
-		m_textureImageUI->setOrigin(UI::Vec2(imageSize, 0.0f));
-		m_textureImageUI->setPosition(UI::Vec2(m_animationPanel->getSize().x - padding.x, padding.y));
-		m_textureImageUI->setClearColor(m_backgroundClearColor);
-
-		m_animationPanel->addChild(m_textureImageUI);
+		m_animationPanel->addChild(_target);
 	}
 
 	void Editor::initializePreviewPanel()

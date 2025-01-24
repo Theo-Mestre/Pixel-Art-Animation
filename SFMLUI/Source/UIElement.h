@@ -4,6 +4,8 @@
 #include "SFML/Graphics/Transformable.hpp"
 #include "SFML/Graphics/VertexArray.hpp"
 
+#include "Vectors.h"
+
 namespace sf
 {
 	class Event;
@@ -11,10 +13,6 @@ namespace sf
 
 namespace UI
 {
-	using Vec2 = sf::Vector2f;
-	using Vec2i = sf::Vector2i;
-	using Vec2u = sf::Vector2u;
-
 	class Module;
 
 	class UIElement

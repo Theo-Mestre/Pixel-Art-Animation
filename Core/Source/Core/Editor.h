@@ -13,6 +13,7 @@ namespace UI
 	class Button;
 	class Image;
 	class PanelRenderer;
+	class MousePickerModule;
 }
 
 namespace Animation
@@ -29,6 +30,15 @@ namespace Animation
 		std::string AnimationPath;
 		std::string TexturePath;
 	};
+
+	namespace SelectedImage
+	{
+		enum SelectedImage
+		{
+			Animation,
+			Texture
+		};
+	}
 
 	class Editor
 	{
@@ -51,6 +61,7 @@ namespace Animation
 
 		void saveAnimationFile();
 
+		void processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker);
 		void updateImageData();
 
 		// UI Initialization
@@ -60,6 +71,7 @@ namespace Animation
 
 		void initializeAnimationPanel();
 		void initializeAnimationImages();
+		void createAnimationImage(UI::Image* _target, const std::string& _texPath, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback);
 
 		void initializePreviewPanel();
 	private:
