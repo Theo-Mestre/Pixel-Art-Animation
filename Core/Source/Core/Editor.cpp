@@ -30,6 +30,8 @@ namespace Animation
 		m_windowSize = (UI::Vec2)m_data.Window->getSize();
 
 		initializeUI();
+
+		updateImageData();
 	}
 
 	void Editor::receiveEvent(const sf::Event& _event)
@@ -53,11 +55,6 @@ namespace Animation
 		m_data = _editorData;
 	}
 
-	sf::Vector2f Editor::normalizeCoordinates(sf::Vector2i _coord)
-	{
-		return  UI::Vec2((float)_coord.x / (float)m_textureSize.x, (float)_coord.y / (float)m_textureSize.y);
-	}
-
 	void Editor::saveAnimationFile()
 	{
 		updateImageData();
@@ -71,14 +68,22 @@ namespace Animation
 	{
 		std::string targetName = _selectedImage == SelectedImage::Animation ? "Animation" : "Texture";
 
-		if (_picker->isSelected())
-		{
-			std::cout << targetName << " selected at: " << _picker->getSelectedPosition() << std::endl;
-		}
-		else
-		{
-			std::cout << targetName << " deselected" << std::endl;
-		}
+		UI::Vec2 selectedPosition = _picker->getSelectedPosition();
+		UI::Vec2 size = _picker->getPickingZone().getSize();
+
+		// Change the position to be in the texture space
+		selectedPosition.x = selectedPosition.x / size.x * m_textureSize.x;
+		selectedPosition.y = selectedPosition.y / size.y * m_textureSize.y;
+
+		// Round the position
+		selectedPosition.x = (int)selectedPosition.x;
+		selectedPosition.y = (int)selectedPosition.y;
+
+		// snap the position to the screen position of a pixel
+		selectedPosition.x *= size.x / m_textureSize.x;
+		selectedPosition.y *= size.y / m_textureSize.y;
+
+		_picker->setSelectedPosition(selectedPosition);
 	}
 
 	void Editor::updateImageData()
@@ -89,7 +94,9 @@ namespace Animation
 		// Create the image if it doesn't exist or the size is different from the texture
 		if (animationTexture->getSize() != m_animationImage.getSize())
 		{
-			m_animationImage.create(animationTexture->getSize().x, animationTexture->getSize().y, sf::Color::Transparent);
+			m_textureSize = animationTexture->getSize();
+
+			m_animationImage.create((uint32_t)m_textureSize.x, (uint32_t)m_textureSize.y, sf::Color::Transparent);
 			m_animationImage.copy(animationTexture->copyToImage(), 0, 0);
 		}
 
@@ -124,7 +131,6 @@ namespace Animation
 		float functionPanelHeight = m_windowSize.y * m_functionPanelHeightInPercent * 0.01f;
 		float padding = m_padding * 2.0f;
 		UI::Vec2 panelSize = UI::Vec2(m_windowSize.x - padding, functionPanelHeight - padding);
-
 
 		m_functionPanel = new UI::Panel();
 		m_functionPanel->initialize();
@@ -199,20 +205,20 @@ namespace Animation
 
 		// Create the animation image
 		UI::Vec2 animationPosition = padding;
-		createAnimationImage(m_animationImageUI, m_data.AnimationPath, animationPosition, imageSize, [this](UI::MousePickerModule* _picker)
+		m_animationImageUI = createAnimationImage(m_data.AnimationPath, animationPosition, imageSize, [this](UI::MousePickerModule* _picker)
 			{
 				processSelectedPosition(SelectedImage::Animation, _picker);
 			});
 
 		// Create the texture image
 		UI::Vec2 texturePosition((m_animationPanel->getSize().x + padding.x) * 0.5f, padding.y);
-		createAnimationImage(m_textureImageUI, m_data.TexturePath, texturePosition, imageSize, [this](UI::MousePickerModule* _picker)
+		m_textureImageUI = createAnimationImage(m_data.TexturePath, texturePosition, imageSize, [this](UI::MousePickerModule* _picker)
 			{
 				processSelectedPosition(SelectedImage::Texture, _picker);
 			});
 	}
 
-	void Editor::createAnimationImage(UI::Image* _target, const std::string& _texPath, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback)
+	UI::Image* Editor::createAnimationImage(const std::string& _texPath, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback)
 	{
 		auto texture = new sf::Texture();
 		if (!texture->loadFromFile(_texPath))
@@ -220,21 +226,26 @@ namespace Animation
 			std::cout << "Failed to load texture: " << _texPath << std::endl;
 		}
 
-		_target = new UI::Image();
-		_target->initialize();
-		_target->setTexture(texture);
-		_target->setPosition(_position);
-		_target->setSize(_size);
-		_target->setClearColor(m_backgroundClearColor);
+		UI::Image* image = new UI::Image();
+		image->initialize();
+		image->setTexture(texture);
+		image->setPosition(_position);
+		image->setSize(_size);
+		image->setClearColor(m_backgroundClearColor);
 
 		UI::MousePickerModule* animationPicker = new UI::MousePickerModule();
-		_target->addModule(animationPicker);
+
+		image->addModule(animationPicker);
 
 		UI::PickingZone pickingZone(_position + m_animationPanel->getPosition(), _size);
 		animationPicker->setPickingZone(pickingZone);
-		animationPicker->SetSelectionCallback(std::bind(_callback, animationPicker));	
+		animationPicker->setSelectionCallback(std::bind(_callback, animationPicker));	
+		float pixelSize = _size.x / (float)texture->getSize().x;
+		animationPicker->setSelectorSize(UI::Vec2(pixelSize, pixelSize));
 
-		m_animationPanel->addChild(_target);
+		m_animationPanel->addChild(image);
+
+		return image;
 	}
 
 	void Editor::initializePreviewPanel()

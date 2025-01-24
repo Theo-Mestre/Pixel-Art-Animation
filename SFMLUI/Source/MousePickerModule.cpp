@@ -11,9 +11,15 @@ namespace UI
 		: Module()
 		, m_pickingZone()
 		, m_selectedPosition()
+		, m_selectorSize()
 		, m_isSelected(false)
 		, m_selectionCallback(nullptr)
+		, m_vertices(sf::Quads, 4)
 	{
+		for (int i = 0; i < 4; i++)
+		{
+			m_vertices[i].color = sf::Color(255, 255, 255, 100);
+		}
 	}
 
 	void MousePickerModule::receiveEvent(const sf::Event& _event)
@@ -71,6 +77,12 @@ namespace UI
 		return m_isSelected;
 	}
 
+	void MousePickerModule::setSelectedPosition(const Vec2& _position)
+	{
+		m_selectedPosition = _position + m_pickingZone.getPosition();
+		UpdateVertexPositions();
+	}
+
 	const Vec2& MousePickerModule::getSelectedPosition() const
 	{
 		return
@@ -80,18 +92,30 @@ namespace UI
 		};
 	}
 
+	void MousePickerModule::setSelectedScreenPosition(const Vec2& _position)
+	{
+		m_selectedPosition = _position;
+		UpdateVertexPositions();
+	}
+
 	const Vec2& MousePickerModule::getSelectedScreenPosition() const
 	{
 		return m_selectedPosition;
 	}
 
-	void MousePickerModule::SetSelectionCallback(std::function<void()> _callback)
+	void MousePickerModule::setSelectionCallback(std::function<void()> _callback)
 	{
 		m_selectionCallback = _callback;
 	}
 
+	void MousePickerModule::setSelectorSize(const Vec2& _size)
+	{
+		m_selectorSize = _size;
+	}
+
 	void MousePickerModule::draw(sf::RenderTarget& _target, sf::RenderStates _states) const
 	{
+		_target.draw(m_vertices, _states.Default);
 	}
 
 	bool MousePickerModule::isMouseInsidePickingZone(const Vec2& _mousePos) const
@@ -101,5 +125,13 @@ namespace UI
 		return m_pickingZone.contains(_mousePos);
 	}
 
+	void MousePickerModule::UpdateVertexPositions()
+	{
+		auto position = getSelectedScreenPosition();
 
+		m_vertices[0].position = sf::Vector2f(position.x, position.y);
+		m_vertices[1].position = sf::Vector2f(position.x + m_selectorSize.x, position.y);
+		m_vertices[2].position = sf::Vector2f(position.x + m_selectorSize.x, position.y + m_selectorSize.y);
+		m_vertices[3].position = sf::Vector2f(position.x, position.y + m_selectorSize.y);
+	}
 }

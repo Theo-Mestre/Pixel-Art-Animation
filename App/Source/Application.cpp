@@ -4,7 +4,7 @@
 
 #include "Application.h"
 
-constexpr const char* TEXTURE_PATH = "Texture2.png";
+constexpr const char* TEXTURE_PATH = "Texture.png";
 constexpr const char* ANIMATION_PATH = "Animation.png";
 constexpr uint32_t ANIM_COUNT_X = 1;
 constexpr uint32_t ANIM_COUNT_Y = 1;
@@ -17,7 +17,6 @@ Application::Application()
 
 Application::~Application()
 {
-
 }
 
 void Application::Run()
@@ -84,4 +83,7 @@ void Application::OnShutdown()
 {
 	delete m_window;
 	m_window = nullptr;
+
+	delete m_editor;
+	m_editor = nullptr;
 }

@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
 #include "Modules.h"
@@ -25,22 +26,29 @@ namespace UI
 		void setSelected(bool _selected);
 		bool isSelected() const;
 
+		void setSelectedPosition(const Vec2& _position);
 		const Vec2& getSelectedPosition() const;
+		void setSelectedScreenPosition(const Vec2& _position);
 		const Vec2& getSelectedScreenPosition() const;
 
-		void SetSelectionCallback(std::function<void()> _callback);
+		void setSelectionCallback(std::function<void()> _callback);
+
+		void setSelectorSize(const Vec2& _size);
 	private:
 		void draw(sf::RenderTarget& _target, sf::RenderStates _states) const override;
 
 		bool isMouseInsidePickingZone(const Vec2& _mousePos) const;
-
+		void UpdateVertexPositions();
 	private:
 		PickingZone m_pickingZone;
 		Vec2 m_selectedPosition;
+		Vec2 m_selectorSize;
 
 		bool m_isSelected = false;
 
 		std::function<void()> m_selectionCallback;
+
+		sf::VertexArray m_vertices;
 	};
 
 }

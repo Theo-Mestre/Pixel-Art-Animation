@@ -57,8 +57,6 @@ namespace Animation
 		void setData(const EditorData& _editorData);
 
 	private:
-		sf::Vector2f normalizeCoordinates(sf::Vector2i _coord);
-
 		void saveAnimationFile();
 
 		void processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker);
@@ -71,7 +69,7 @@ namespace Animation
 
 		void initializeAnimationPanel();
 		void initializeAnimationImages();
-		void createAnimationImage(UI::Image* _target, const std::string& _texPath, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback);
+		UI::Image* createAnimationImage(const std::string& _texPath, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback);
 
 		void initializePreviewPanel();
 	private:
@@ -84,9 +82,6 @@ namespace Animation
 
 		SelectionCursor m_animationCursor;
 		SelectionCursor m_textureCursor;
-
-		float m_scaleFromTexToPanel;
-		float m_scaleFromPanelToTex;
 
 		sf::Vector2u m_textureSize;
 
