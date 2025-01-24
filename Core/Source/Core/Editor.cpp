@@ -23,6 +23,7 @@ namespace Animation
 		m_animationPanel = nullptr;
 	}
 
+#pragma region EditorLoop
 	void Editor::initialize()
 	{
 		m_windowSize = (UI::Vec2)m_data.Window->getSize();
@@ -36,7 +37,7 @@ namespace Animation
 		{
 			if (_event.key.code == sf::Keyboard::Space)
 			{
-				m_animationImage.saveToFile("AnimationTest.png");
+				//m_animationImage.saveToFile(m_data.AnimationPath);
 			}
 		}
 
@@ -52,6 +53,7 @@ namespace Animation
 	{
 		m_data.Window->draw(m_editorPanel);
 	}
+#pragma endregion
 
 	void Editor::setData(const EditorData& _editorData)
 	{
@@ -63,6 +65,30 @@ namespace Animation
 		return  UI::Vec2((float)_coord.x / (float)m_textureSize.x, (float)_coord.y / (float)m_textureSize.y);
 	}
 
+	void Editor::saveAnimationFile()
+	{
+		updateImageData();
+
+		bool status = m_animationImage.saveToFile(m_data.AnimationPath);
+
+		std::cout << (status ? "Animation saved successfully" : "Failed to save animation") << std::endl;
+	}
+
+	void Editor::updateImageData()
+	{
+		auto animationTexture = m_animationImageUI->getTexture();
+		if (animationTexture == nullptr) return;
+
+		if (animationTexture->getSize() != m_animationImage.getSize())
+		{
+			m_animationImage.create(animationTexture->getSize().x, animationTexture->getSize().y, sf::Color::Transparent);
+			m_animationImage.copy(animationTexture->copyToImage(), 0, 0);
+		}
+
+		animationTexture->update(m_animationImage);
+	}
+
+#pragma region UIInitialization
 	void Editor::initializeUI()
 	{
 		m_font.loadFromFile("Fonts/Font.otf");
@@ -109,7 +135,7 @@ namespace Animation
 		std::function<void()> buttonCallback[buttonNumber] =
 		{
 			[this]() { m_animationCursor.SetSelected(true); },
-			[this]() { m_animationImage.saveToFile("AnimationTest.png"); },
+			[this]() { saveAnimationFile(); },
 			[this]()
 			{
 				m_animationPanel->setVisible(!m_animationPanel->isVisible());
@@ -212,7 +238,7 @@ namespace Animation
 		AnimatedSprite& sprite = m_spriteModule->asSprite();
 		
 		UI::Vec2 spritePosition = m_previewPanel->getSize() / 2.0f - UI::Vec2(m_padding, m_padding);
-		UI::Vec2 spriteSize = (UI::Vec2)sprite.GetFrameSize();
+		UI::Vec2 spriteSize = (UI::Vec2)sprite.getFrameSize();
 		float scale = m_previewPanel->getSize().y / (float)spriteSize.y;
 		UI::Vec2 origin = spriteSize * 0.5f;
 
@@ -224,4 +250,5 @@ namespace Animation
 
 		m_editorPanel.addChild(m_previewPanel);
 	}
+#pragma endregion 
 }

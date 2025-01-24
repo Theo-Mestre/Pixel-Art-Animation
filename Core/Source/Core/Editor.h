@@ -49,6 +49,10 @@ namespace Animation
 	private:
 		sf::Vector2f normalizeCoordinates(sf::Vector2i _coord);
 
+		void saveAnimationFile();
+
+		void updateImageData();
+
 		// UI Initialization
 		void initializeUI();
 		void initializeFunctionPanel();

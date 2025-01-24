@@ -1,6 +1,6 @@
 #include "corepch.h"
 
-#include "UIElement.h"
+#include "Core/Editor.h"
 
 #include "Application.h"
 
@@ -11,8 +11,7 @@ constexpr uint32_t ANIM_COUNT_Y = 1;
 
 Application::Application()
 	: m_window(nullptr)
-	, m_editor()
-	, m_switchDisplay(true)
+	, m_editor(nullptr)
 {
 }
 
@@ -47,7 +46,7 @@ void Application::Run()
 
 bool Application::isRunning() const
 {
-	return m_window && m_window->isOpen();
+	return m_window != nullptr && m_window->isOpen();
 }
 
 void Application::OnInitialize()
@@ -60,64 +59,25 @@ void Application::OnInitialize()
 	editorData.AnimationPath = ANIMATION_PATH;
 	editorData.TexturePath = TEXTURE_PATH;
 
-	m_editor.setData(editorData);
-	m_editor.initialize();
-
-	//m_sprite = new Animation::AnimatedSprite(
-	//	{
-	//		ANIMATION_PATH,
-	//		TEXTURE_PATH,
-	//		sf::Vector2u(ANIM_COUNT_X, ANIM_COUNT_Y),
-	//		0.1f
-	//	}
-	//);
-	//
-	//m_sprite->setPosition(540.0f, 360.0f);
-	//m_sprite->setOrigin(24.0f, 24.0f);
-	//m_sprite->setScale(6.0f, 6.0f);
-
+	m_editor = new Animation::Editor(editorData);
+	m_editor->initialize();
 }
 
 void Application::OnEvent(const sf::Event& _event)
 {
 	if (_event.type == sf::Event::Closed) m_window->close();
 
-	if (_event.type == sf::Event::KeyPressed)
-	{
-		if (_event.key.code == sf::Keyboard::Tab)
-		{
-			m_switchDisplay = !m_switchDisplay;
-		}
-	}
-
-	if (m_switchDisplay)
-	{
-		m_editor.receiveEvent(_event);
-	}
+	m_editor->receiveEvent(_event);
 }
 
 void Application::OnUpdate(float _deltaTime)
 {
-	if (m_switchDisplay)
-	{
-		m_editor.update(_deltaTime);
-	}
-	else
-	{
-		//m_sprite->update(_deltaTime);
-	}
+	m_editor->update(_deltaTime);
 }
 
 void Application::OnRender()
 {
-	if (m_switchDisplay)
-	{
-		m_editor.draw();
-	}
-	else
-	{
-		//m_window->draw(*m_sprite);
-	}
+	m_editor->draw();
 }
 
 void Application::OnShutdown()

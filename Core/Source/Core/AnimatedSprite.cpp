@@ -78,7 +78,7 @@ namespace Animation
 			}
 		}
 		
-		UpdateVertices();
+		updateVertices();
 
 		m_shader.setUniform("u_texture", m_texture);
 		m_shader.setUniform("u_animation", m_animation);
@@ -92,7 +92,7 @@ namespace Animation
 		target.draw(m_vertices, states);
 	}
 
-	void AnimatedSprite::UpdateVertices()
+	void AnimatedSprite::updateVertices()
 	{
 		float width = static_cast<float>(m_frameSize.x);
 		float height = static_cast<float>(m_frameSize.y);

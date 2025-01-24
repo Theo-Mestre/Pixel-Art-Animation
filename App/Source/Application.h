@@ -1,12 +1,14 @@
 #pragma once
 
-#include "Core/AnimatedSprite.h"
-#include "Core/Editor.h"
-
 namespace sf
 {
 	class RenderWindow;
 	class Event;
+}
+
+namespace Animation
+{
+	class Editor;
 }
 
 class Application
@@ -27,10 +29,5 @@ private:
 private:
 	sf::RenderWindow* m_window;
 
-	sf::Texture m_whiteTexture;
-
-	Animation::AnimatedSprite* m_sprite;
-	Animation::Editor m_editor;
-
-	bool m_switchDisplay;
+	Animation::Editor* m_editor;
 };

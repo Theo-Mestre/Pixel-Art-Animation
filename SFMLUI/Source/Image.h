@@ -27,6 +27,9 @@ namespace UI
 		void setColor(const sf::Color& _color);
 		void setClearColor(const sf::Color& _color);
 
+		const sf::Texture* getTexture() const;
+		sf::Texture* getTexture();
+
 	private:
 		virtual void draw(sf::RenderTarget& _target, sf::RenderStates _states) const override;
 

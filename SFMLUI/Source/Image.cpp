@@ -83,6 +83,16 @@ namespace UI
 		m_clearColor = _color;
 	}
 
+	const sf::Texture* Image::getTexture() const
+	{
+		return m_texture;
+	}
+
+	sf::Texture* Image::getTexture()
+	{
+		return m_texture;
+	}
+
 	void Image::draw(sf::RenderTarget& _target, sf::RenderStates _states) const
 	{
 		if (!isVisible()) return;

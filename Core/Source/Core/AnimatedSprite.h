@@ -21,25 +21,25 @@ namespace Animation
 		~AnimatedSprite();
 
 #pragma region Accessors
-		inline void SetTexture(const sf::Texture& _texture) { m_texture = _texture; }
-		inline void SetAnimation(const sf::Texture& _animation) { m_animation = _animation; }
+		inline void setTexture(const sf::Texture& _texture) { m_texture = _texture; }
+		inline void setAnimation(const sf::Texture& _animation) { m_animation = _animation; }
 
-		inline void SetFrameSize(const sf::Vector2u& _frameSize) { m_frameSize = _frameSize; }
-		inline void SetFrameNumber(const sf::Vector2u& _frameNumber) { m_frameNumber = _frameNumber; }
-		inline void SetCurrentFrame(const sf::Vector2u& _currentFrame) { m_currentFrame = _currentFrame; }
+		inline void setFrameSize(const sf::Vector2u& _frameSize) { m_frameSize = _frameSize; }
+		inline void setFrameNumber(const sf::Vector2u& _frameNumber) { m_frameNumber = _frameNumber; }
+		inline void setCurrentFrame(const sf::Vector2u& _currentFrame) { m_currentFrame = _currentFrame; }
 
-		inline void SetFrameDuration(float _frameDuration) { m_frameDuration = _frameDuration; }
-		inline void SetElapsedTime(float _elapsedTime) { m_elapsedTime = _elapsedTime; }
+		inline void setFrameDuration(float _frameDuration) { m_frameDuration = _frameDuration; }
+		inline void setElapsedTime(float _elapsedTime) { m_elapsedTime = _elapsedTime; }
 
-		inline const sf::Texture& GetTexture() const { return m_texture; }
-		inline const sf::Texture& GetAnimation() const { return m_animation; }
+		inline const sf::Texture& getTexture() const { return m_texture; }
+		inline const sf::Texture& getAnimation() const { return m_animation; }
 
-		inline const sf::Vector2u& GetFrameSize() const { return m_frameSize; }
-		inline const sf::Vector2u& GetFrameNumber() const { return m_frameNumber; }
-		inline const sf::Vector2u& GetCurrentFrame() const { return m_currentFrame; }
+		inline const sf::Vector2u& getFrameSize() const { return m_frameSize; }
+		inline const sf::Vector2u& getFrameNumber() const { return m_frameNumber; }
+		inline const sf::Vector2u& getCurrentFrame() const { return m_currentFrame; }
 
-		inline float GetFrameDuration() const { return m_frameDuration; }
-		inline float GetElapsedTime() const { return m_elapsedTime; }
+		inline float getFrameDuration() const { return m_frameDuration; }
+		inline float getElapsedTime() const { return m_elapsedTime; }
 #pragma endregion
 
 		void initialize(AnimationData _data);
@@ -48,7 +48,7 @@ namespace Animation
 	private:
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-		void UpdateVertices();
+		void updateVertices();
 
 	private:
 		sf::Texture m_texture;
