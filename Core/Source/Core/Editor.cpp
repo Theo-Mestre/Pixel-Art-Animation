@@ -75,8 +75,6 @@ namespace Animation
 
 	void Editor::processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker)
 	{
-		std::string targetName = _selectedImage == SelectedImage::Animation ? "Animation" : "Texture";
-
 		UI::Vec2 selectedPosition = _picker->getSelectedPosition();
 		UI::Vec2 size = _picker->getPickingZone().getSize();
 
@@ -86,8 +84,6 @@ namespace Animation
 		// snap the position to the screen position of a pixel
 		selectedPosition.x *= size.x / m_textureSize.x;
 		selectedPosition.y *= size.y / m_textureSize.y;
-
-
 		_picker->setSelectedPosition(selectedPosition);
 
 		//// If the texture is selected, update the texture image
@@ -98,6 +94,9 @@ namespace Animation
 			m_imagePickers[SelectedImage::Animation]->isSelected() == false) return;
 
 		updateAnimationImage();
+
+		m_imagePickers[SelectedImage::Animation]->setSelected(false);
+		m_imagePickers[SelectedImage::Texture]->setSelected(false);
 	}
 
 	void Editor::updateAnimationImage()
@@ -111,9 +110,6 @@ namespace Animation
 		m_animationImage.setPixel(selectedAnimCoord.x, selectedAnimCoord.y, getCoordColor(selectedTexCoord));
 
 		updateImageData();
-
-		animationPicker->setSelected(false);
-		texturePicker->setSelected(false);
 	}
 
 	void Editor::updateImageData()
@@ -204,10 +200,13 @@ namespace Animation
 			{
 				m_animationPanel->setVisible(!m_animationPanel->isVisible());
 				m_previewPanel->setVisible(!m_previewPanel->isVisible());
+
+				// update the animation of the animated sprite
+				m_spriteModule->asSprite().setAnimation(*m_animationImageUI->getTexture());
 			}
 		};
 
-		for (int i = 0; i < buttonNumber; i++)
+		for (size_t i = 0; i < buttonNumber; i++)
 		{
 			buttonPosition.x = buttonPadding + (buttonSize.x + buttonPadding) * i;
 
