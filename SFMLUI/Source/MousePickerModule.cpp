@@ -39,7 +39,7 @@ namespace UI
 			return;
 		}
 
-		// If left clic is pressed
+		// if left clic isn't pressed return
 		if (_event.mouseButton.button != sf::Mouse::Left) return;
 
 		// enable selection and invoke callback
@@ -115,6 +115,8 @@ namespace UI
 
 	void MousePickerModule::draw(sf::RenderTarget& _target, sf::RenderStates _states) const
 	{
+		if (!m_isSelected) return;
+
 		_target.draw(m_vertices, _states.Default);
 	}
 

@@ -36,7 +36,9 @@ namespace Animation
 		enum SelectedImage
 		{
 			Animation,
-			Texture
+			Texture,
+
+			Count
 		};
 	}
 
@@ -59,8 +61,11 @@ namespace Animation
 	private:
 		void saveAnimationFile();
 
+		UI::Vec2i fromScreenToTextureCoord(const UI::Vec2& _position, const UI::Vec2& _size);
 		void processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker);
+		void updateAnimationImage();
 		void updateImageData();
+		sf::Color getCoordColor(const UI::Vec2i& _position);
 
 		// UI Initialization
 		void initializeUI();
@@ -80,9 +85,6 @@ namespace Animation
 
 		sf::Image m_animationImage;
 
-		SelectionCursor m_animationCursor;
-		SelectionCursor m_textureCursor;
-
 		sf::Vector2u m_textureSize;
 
 		// UI
@@ -97,6 +99,7 @@ namespace Animation
 		// Images 
 		UI::Image* m_animationImageUI = nullptr;
 		UI::Image* m_textureImageUI = nullptr;
+		UI::MousePickerModule* m_imagePickers[SelectedImage::Count];
 
 		// ImageSettings
 		float m_imagePadding = 10.0f;

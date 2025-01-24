@@ -65,5 +65,20 @@ namespace UI
 		bool m_visible;
 		bool m_receiveEvents;
 		bool m_hovered;
+
+	public:
+		template <typename T>
+		T* getFirstModuleOfType() const
+		{
+			static_assert(std::is_base_of<Module, T>::value, "T must derive from Module");
+
+			for (auto module : m_modules)
+			{
+				if (dynamic_cast<T*>(module) != nullptr)
+				{
+					return static_cast<T*>(module);
+				}
+			}
+		}
 	};
 }
