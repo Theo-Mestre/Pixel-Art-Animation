@@ -61,20 +61,23 @@ namespace Animation
 	private:
 		void saveAnimationFile();
 
-		UI::Vec2i fromScreenToTextureCoord(const UI::Vec2& _position, const UI::Vec2& _size);
+		UI::Vec2i fromScreenToTextureCoord(const UI::Vec2& _position, const UI::Vec2& _size, const UI::Vec2u& _textureSize);
 		void processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker);
 		void updateAnimationImage();
 		void updateImageData();
 		sf::Color getCoordColor(const UI::Vec2i& _position);
+		void updateAnimationRect();
 
 		// UI Initialization
 		void initializeUI();
+		void initializeTextures();
 		void initializeFunctionPanel();
 		void initializeFunctionButtons();
+		void initializeAnimEditionButtons();
 
 		void initializeAnimationPanel();
 		void initializeAnimationImages();
-		UI::Image* createAnimationImage(const std::string& _texPath, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback);
+		UI::Image* createAnimationImage(sf::Texture* _tex, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback);
 
 		void initializePreviewPanel();
 	private:
@@ -86,6 +89,9 @@ namespace Animation
 		sf::Image m_animationImage;
 
 		sf::Vector2u m_textureSize;
+		UI::Vec2 m_animTotalSize;
+		UI::Vec2 m_animFrameSize;
+		UI::Vec2u m_selectedFrame;
 
 		// UI
 		UI::Panel m_editorPanel;
@@ -99,7 +105,8 @@ namespace Animation
 		// Images 
 		UI::Image* m_animationImageUI = nullptr;
 		UI::Image* m_textureImageUI = nullptr;
-		UI::MousePickerModule* m_imagePickers[SelectedImage::Count];
+		UI::MousePickerModule* m_imagePickers[SelectedImage::Count] = { nullptr };
+		sf::Texture* m_texture[SelectedImage::Count] = { nullptr };
 
 		// ImageSettings
 		float m_imagePadding = 10.0f;

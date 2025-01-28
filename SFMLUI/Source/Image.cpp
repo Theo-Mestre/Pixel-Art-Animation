@@ -17,10 +17,12 @@ namespace UI
 		, m_textureRect()
 		, m_clearColor(sf::Color::Transparent)
 	{
-	}
+	} 
 
 	Image::~Image()
 	{
+		if (m_texture) return;
+
 		delete m_texture;
 		m_texture = nullptr;
 	}
