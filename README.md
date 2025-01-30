@@ -28,6 +28,8 @@ Include the `AnimatedSprite` class in your project to integrate animations. The 
 #### Editor
 Run the editor to create or modify animation mappings for your texture. Once completed, save the mappings to integrate them into your game or project.
 
+Figma Board: https://www.figma.com/design/pwXmeGTGsy7Qp3yq8xyIjQ/Pixel-Art-Animator?node-id=0-1&t=cYlQ9sqwOG7hhH4U-1
+
 ## Contributing
 Contributions are welcome! Feel free to submit issues or pull requests to help improve the project.
 
