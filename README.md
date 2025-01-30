@@ -21,7 +21,7 @@ All dependencies are included in the project so all you need to do is clone and 
    git clone https://github.com/Theo-Mestre/Pixel-Art-Animation.git
    ```
 3. Build the project:
-   - Run the Scripts/SetupUpSolution.bat to create the files using premake5
+   - Run the `Scripts/SetupUpSolution.bat` to create the project files using premake5
 
 ### Usage
 #### AnimatedSprite Class
