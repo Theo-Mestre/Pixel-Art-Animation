@@ -6,8 +6,6 @@
 
 #include "Panel.h"
 
-#include "SelectionCursor.h"
-
 namespace UI
 {
 	class Button;
@@ -61,12 +59,13 @@ namespace Animation
 	private:
 		void saveAnimationFile();
 
-		UI::Vec2i fromScreenToTextureCoord(const UI::Vec2& _position, const UI::Vec2& _size, const UI::Vec2u& _textureSize);
 		void processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker);
-		void updateAnimationImage();
+		void updateAnimationImage(const UI::Vec2i& _animCoord, const UI::Vec2i& _texCoord);
 		void updateImageData();
 		sf::Color getCoordColor(const UI::Vec2i& _position);
 		void updateAnimationRect();
+
+		void OpenFile();
 
 		// UI Initialization
 		void initializeUI();

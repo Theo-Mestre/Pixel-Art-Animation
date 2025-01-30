@@ -1,5 +1,7 @@
 #include "corepch.h"
 
+#include "FileUtility.h"
+
 #include "Button.h"
 #include "Image.h"
 #include "PanelRenderer.h"
@@ -81,53 +83,35 @@ namespace Animation
 		std::cout << (status ? "Animation saved successfully" : "Failed to save animation") << std::endl;
 	}
 
-	UI::Vec2i Editor::fromScreenToTextureCoord(const UI::Vec2& _position, const UI::Vec2& _size, const UI::Vec2u& _textureSize)
-	{
-		return
-		{
-			(int)(_position.x / _size.x * _textureSize.x),
-			(int)(_position.y / _size.y * _textureSize.y)
-		};
-	}
-
+#pragma region ImageProcessing
 	void Editor::processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker)
 	{
-		UI::Vec2 selectedPosition = _picker->getSelectedPosition();
-		UI::Vec2 size = _picker->getPickingZone().getSize();
-
-		// Change the position to be in the texture space
-		UI::Vec2u texSize = _selectedImage == SelectedImage::Animation ? (UI::Vec2u)m_animFrameSize : m_textureSize;
-		selectedPosition = (UI::Vec2)fromScreenToTextureCoord(selectedPosition, size, texSize);
-
-		// snap the position to the screen position of a pixel
-		selectedPosition.x *= size.x / texSize.x;
-		selectedPosition.y *= size.y / texSize.y;
-		_picker->setSelectedPosition(selectedPosition);
-
-		// If the texture is selected, update the texture image
+		// Update the texture if the selected image is the texture and the animation is already selected
 		if (_selectedImage != SelectedImage::Texture) return;
 
 		if (m_imagePickers[SelectedImage::Animation] == nullptr ||
 			m_imagePickers[SelectedImage::Texture] == nullptr ||
 			m_imagePickers[SelectedImage::Animation]->isSelected() == false) return;
 
-		updateAnimationImage();
+		UI::Vec2i selectedTexCoord = m_imagePickers[SelectedImage::Texture]->getSelectorPositionInPixelSpace();
+		UI::Vec2i selectedAnimCoord = m_imagePickers[SelectedImage::Animation]->getSelectorPositionInPixelSpace();
+
+		selectedAnimCoord.x += m_selectedFrame.x * (int)m_animFrameSize.x;
+		selectedAnimCoord.y += m_selectedFrame.y * (int)m_animFrameSize.y;
+
+		updateAnimationImage(selectedAnimCoord, selectedTexCoord);
 
 		m_imagePickers[SelectedImage::Animation]->setSelected(false);
 		m_imagePickers[SelectedImage::Texture]->setSelected(false);
 	}
 
-	void Editor::updateAnimationImage()
+	void Editor::updateAnimationImage(const UI::Vec2i& _animCoord, const UI::Vec2i& _texCoord)
 	{
-		auto animationPicker = m_imagePickers[SelectedImage::Animation];
-		auto texturePicker = m_imagePickers[SelectedImage::Texture];
+		if (_animCoord.x < 0 || _animCoord.x >= m_animTotalSize.x ||
+			_animCoord.y < 0 || _animCoord.y >= m_animTotalSize.y)
+			return;
 
-		UI::Vec2i selectedAnimCoord = fromScreenToTextureCoord(animationPicker->getSelectedPosition(), animationPicker->getPickingZone().getSize(), (UI::Vec2u)m_animFrameSize);
-		selectedAnimCoord.x += m_selectedFrame.x * m_animFrameSize.x;
-		std::cout << "Selected Animation Coord: " << m_selectedFrame.x << ", " << m_selectedFrame.y << std::endl;
-		UI::Vec2i selectedTexCoord = fromScreenToTextureCoord(texturePicker->getSelectedPosition(), texturePicker->getPickingZone().getSize(), m_textureSize);
-
-		m_animationImage.setPixel(selectedAnimCoord.x, selectedAnimCoord.y, getCoordColor(selectedTexCoord));
+		m_animationImage.setPixel(_animCoord.x, _animCoord.y, getCoordColor(_texCoord));
 
 		updateImageData();
 	}
@@ -166,10 +150,24 @@ namespace Animation
 
 		return sf::Color(mappedCoord.x, mappedCoord.y, MaxColor, MaxColor);
 	}
+#pragma endregion
 
 	void Editor::updateAnimationRect()
 	{
 		m_animationImageUI->setTextureRect({ (int)(m_selectedFrame.x * m_animFrameSize.x), (int)(m_selectedFrame.y * m_animFrameSize.y), (int)m_animFrameSize.x, (int)m_animFrameSize.y });
+	}
+
+	void Editor::OpenFile()
+	{
+		std::string path = Utility::OpenFileDialog("Textures", "png");
+		if (path.empty()) return;
+		
+		if (!m_texture[0]->loadFromFile(path))
+		{
+			std::cout << "Failed to load texture: " << path << std::endl;
+		}
+
+		updateImageData();
 	}
 
 #pragma region UIInitialization
@@ -243,7 +241,7 @@ namespace Animation
 
 		std::function<void()> buttonCallback[buttonNumber] =
 		{
-			[this]() { std::cout << "Open not implemented yet!" << std::endl; },
+			[this]() { OpenFile(); },
 			[this]() { saveAnimationFile(); },
 			[this]()
 			{
@@ -330,6 +328,7 @@ namespace Animation
 		// Create the animation image
 		m_animationImageUI = createAnimationImage(SelectedImage::Animation, animationPosition, imageSize);
 		m_animationImageUI->setTextureRect({ 0, 0, (int32_t)m_animFrameSize.x, (int32_t)m_animFrameSize.y });
+		m_imagePickers[SelectedImage::Animation]->setSelectionPixelSize((UI::Vec2u)m_animFrameSize);
 
 		// Create the texture image
 		m_textureImageUI = createAnimationImage(SelectedImage::Texture, texturePosition, imageSize);
@@ -350,6 +349,7 @@ namespace Animation
 		// Creating the ImagePicker Module
 		m_imagePickers[_imageID] = new UI::MousePickerModule();
 		m_imagePickers[_imageID]->setSelectionCallback(std::bind(&Editor::processSelectedPosition, this, _imageID, m_imagePickers[_imageID]));
+		m_imagePickers[_imageID]->setSelectionPixelSize(m_texture[_imageID]->getSize());
 		m_imagePickers[_imageID]->setPickingZone(pickingZone);
 		m_imagePickers[_imageID]->setSelectorSize({
 			_size.x / m_animFrameSize.x,

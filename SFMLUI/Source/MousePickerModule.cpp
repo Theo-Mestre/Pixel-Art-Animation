@@ -7,18 +7,21 @@
 
 namespace UI
 {
+	static constexpr uint8_t VertexCount = 4;
+
 	MousePickerModule::MousePickerModule()
 		: Module()
 		, m_pickingZone()
 		, m_selectedPosition()
 		, m_selectorSize()
+		, m_selectionPixelSize()
 		, m_isSelected(false)
 		, m_selectionCallback(nullptr)
-		, m_vertices(sf::Quads, 4)
+		, m_vertices(sf::Quads, VertexCount)
 	{
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < VertexCount; i++)
 		{
-			m_vertices[i].color = sf::Color(255, 255, 255, 100);
+			m_vertices[i].color = sf::Color::White;
 		}
 	}
 
@@ -37,6 +40,7 @@ namespace UI
 		if (_event.mouseButton.button == sf::Mouse::Right)
 		{
 			m_isSelected = false;
+			m_selectedPosition = Vec2(-1, -1);
 			return;
 		}
 
@@ -45,7 +49,7 @@ namespace UI
 
 		// enable selection and invoke callback
 		m_isSelected = true;
-		m_selectedPosition = Vec2(_event.mouseButton.x, _event.mouseButton.y);
+		setSelectedScreenPosition(Vec2(_event.mouseButton.x, _event.mouseButton.y));
 
 		if (m_selectionCallback)
 		{
@@ -80,28 +84,26 @@ namespace UI
 
 	void MousePickerModule::setSelectedPosition(const Vec2& _position)
 	{
-		m_selectedPosition = _position + m_pickingZone.getPosition();
+		m_selectedPosition = _position;
+		snapToPixelPosition();
 		UpdateVertexPositions();
 	}
 
 	const Vec2& MousePickerModule::getSelectedPosition() const
 	{
-		return
-		{
-			m_selectedPosition.x - m_pickingZone.getPosition().x,
-			m_selectedPosition.y - m_pickingZone.getPosition().y
-		};
+		return m_selectedPosition;
 	}
 
 	void MousePickerModule::setSelectedScreenPosition(const Vec2& _position)
 	{
-		m_selectedPosition = _position;
+		m_selectedPosition = _position - m_pickingZone.getPosition();
+		snapToPixelPosition();
 		UpdateVertexPositions();
 	}
 
 	const Vec2& MousePickerModule::getSelectedScreenPosition() const
 	{
-		return m_selectedPosition;
+		return m_selectedPosition + m_pickingZone.getPosition();
 	}
 
 	void MousePickerModule::setSelectionCallback(std::function<void()> _callback)
@@ -109,9 +111,24 @@ namespace UI
 		m_selectionCallback = _callback;
 	}
 
+	void MousePickerModule::setSelectionPixelSize(const Vec2u& _size)
+	{
+		m_selectionPixelSize = _size;
+	}
+
 	void MousePickerModule::setSelectorSize(const Vec2& _size)
 	{
 		m_selectorSize = _size;
+	}
+
+	Vec2i MousePickerModule::getSelectorPositionInPixelSpace()
+	{
+		return 
+		{
+			// Add 0.01f to avoid rounding errors
+			(int32_t)(m_selectedPosition.x / m_pickingZone.getSize().x * m_selectionPixelSize.x + 0.01f),
+			(int32_t)(m_selectedPosition.y / m_pickingZone.getSize().y * m_selectionPixelSize.y + 0.01f)
+		};
 	}
 
 	void MousePickerModule::draw(sf::RenderTarget& _target, sf::RenderStates _states) const
@@ -136,5 +153,13 @@ namespace UI
 		m_vertices[1].position = sf::Vector2f(position.x + m_selectorSize.x, position.y);
 		m_vertices[2].position = sf::Vector2f(position.x + m_selectorSize.x, position.y + m_selectorSize.y);
 		m_vertices[3].position = sf::Vector2f(position.x, position.y + m_selectorSize.y);
+	}
+
+	void MousePickerModule::snapToPixelPosition()
+	{
+		m_selectedPosition = (UI::Vec2)getSelectorPositionInPixelSpace();
+
+		m_selectedPosition.x *= m_pickingZone.getSize().x / m_selectionPixelSize.x;
+		m_selectedPosition.y *= m_pickingZone.getSize().y / m_selectionPixelSize.y;
 	}
 }
