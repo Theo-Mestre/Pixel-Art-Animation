@@ -7,10 +7,6 @@ Pixel-Art-Animation is a C++ project using SFML that simplifies the process of c
 2. **AnimatedSprite Class**: A reusable class for working with mapped animations, making it easy to integrate animations into your projects.
 3. **Editor Tool**: An editor built with a custom SFML-based UI library (currently in development) to facilitate the creation and adjustment of texture coordinate mappings.
 
-### Known Issues
-- **Editor Bugs**:
-  - Button hitboxes do not take their parent's transforms into account, which may result in incorrect click behavior.
-
 ## Getting Started
 
 All dependencies are included in the project so all you need to do is clone and build the project!
