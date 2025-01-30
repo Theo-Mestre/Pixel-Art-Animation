@@ -77,7 +77,7 @@ namespace Animation
 
 		void initializeAnimationPanel();
 		void initializeAnimationImages();
-		UI::Image* createAnimationImage(sf::Texture* _tex, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback);
+		UI::Image* createAnimationImage(SelectedImage::SelectedImage _imageID, const UI::Vec2& _position, const UI::Vec2& _size);
 
 		void initializePreviewPanel();
 	private:
@@ -99,24 +99,13 @@ namespace Animation
 		UI::Panel* m_animationPanel = nullptr;
 		UI::PanelRenderer* m_previewPanel = nullptr;
 
-		// PanelSettings
-		float m_functionPanelHeightInPercent = 20.0f;
-
 		// Images 
 		UI::Image* m_animationImageUI = nullptr;
 		UI::Image* m_textureImageUI = nullptr;
 		UI::MousePickerModule* m_imagePickers[SelectedImage::Count] = { nullptr };
 		sf::Texture* m_texture[SelectedImage::Count] = { nullptr };
 
-		// ImageSettings
-		float m_imagePadding = 10.0f;
-
-		// LayoutSettings
-		float m_padding = 10.0f;
-
 		// StyelSettings
 		sf::Font m_font;
-		const sf::Color m_backgroundClearColor = sf::Color(20, 20, 20, 255);
-		const sf::Color m_panelClearColor = sf::Color(50, 50, 50, 255);
 	};
 }

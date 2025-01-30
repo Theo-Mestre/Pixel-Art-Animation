@@ -26,10 +26,11 @@ namespace UI
 	{
 		if (_event.type == sf::Event::MouseMoved)
 		{
-			m_owner->setHovered(isMouseInsidePickingZone(Vec2(_event.mouseMove.x, _event.mouseMove.y)));
+			m_isHovered = isMouseInsidePickingZone(Vec2(_event.mouseMove.x, _event.mouseMove.y));
+			m_owner->setHovered(m_isHovered);
 		}
 
-		if (!m_owner->isHovered()) return;
+		if (!m_isHovered) return;
 
 		if (_event.type != sf::Event::MouseButtonPressed) return;
 

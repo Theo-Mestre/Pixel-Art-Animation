@@ -45,6 +45,7 @@ namespace UI
 		Vec2 m_selectorSize;
 
 		bool m_isSelected = false;
+		bool m_isHovered = false;
 
 		std::function<void()> m_selectionCallback;
 

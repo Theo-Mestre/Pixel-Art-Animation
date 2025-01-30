@@ -8,9 +8,14 @@
 #include "AnimatedSpriteModule.h"
 #include "MousePickerModule.h"
 #include "Editor.h"
+#include "EditorLayoutSettings.h"
+
+static constexpr uint8_t MaxColor = 255;
 
 namespace Animation
 {
+	using namespace LayoutSettings;
+
 	Editor::Editor(const EditorData& _editorData)
 		: m_data(_editorData)
 	{
@@ -80,8 +85,8 @@ namespace Animation
 	{
 		return
 		{
-			int(_position.x / _size.x * _textureSize.x),
-			int(_position.y / _size.y * _textureSize.y)
+			(int)(_position.x / _size.x * _textureSize.x),
+			(int)(_position.y / _size.y * _textureSize.y)
 		};
 	}
 
@@ -148,8 +153,6 @@ namespace Animation
 
 	sf::Color Editor::getCoordColor(const UI::Vec2i& _position)
 	{
-		const int maxColor = 255;
-
 		auto texture = m_textureImageUI->getTexture();
 		if (texture == nullptr) return sf::Color::Transparent;
 
@@ -158,10 +161,10 @@ namespace Animation
 			return sf::Color::Transparent;
 
 		UI::Vec2i mappedCoord;
-		mappedCoord.x = (int)((float)_position.x / (float)texture->getSize().x * maxColor);
-		mappedCoord.y = (int)((float)_position.y / (float)texture->getSize().y * maxColor);
+		mappedCoord.x = (int)((float)_position.x / (float)texture->getSize().x * MaxColor);
+		mappedCoord.y = (int)((float)_position.y / (float)texture->getSize().y * MaxColor);
 
-		return sf::Color(mappedCoord.x, mappedCoord.y, maxColor, maxColor);
+		return sf::Color(mappedCoord.x, mappedCoord.y, MaxColor, MaxColor);
 	}
 
 	void Editor::updateAnimationRect()
@@ -179,7 +182,7 @@ namespace Animation
 		m_editorPanel.initialize();
 
 		m_editorPanel.setSize(m_windowSize);
-		m_editorPanel.setColor(m_backgroundClearColor);
+		m_editorPanel.setColor(BackgroundClearColor);
 
 		// Initialize the function panel
 		initializeFunctionPanel();
@@ -188,7 +191,6 @@ namespace Animation
 
 		// Initialize the animation panel
 		initializeAnimationPanel();
-		initializeAnimationImages();
 
 		// Initialize the preview panel
 		initializePreviewPanel();
@@ -217,15 +219,15 @@ namespace Animation
 
 	void Editor::initializeFunctionPanel()
 	{
-		float functionPanelHeight = m_windowSize.y * m_functionPanelHeightInPercent * 0.01f;
-		float padding = m_padding * 2.0f;
+		float functionPanelHeight = m_windowSize.y * FunctionPanelHeightInPercent;
+		float padding = WindowPadding * 2.0f;
 		UI::Vec2 panelSize = UI::Vec2(m_windowSize.x - padding, functionPanelHeight - padding);
 
 		m_functionPanel = new UI::Panel();
 		m_functionPanel->initialize();
 		m_functionPanel->setSize(panelSize);
-		m_functionPanel->setPosition(UI::Vec2(m_padding, m_padding));
-		m_functionPanel->setColor(m_panelClearColor);
+		m_functionPanel->setPosition(UI::Vec2(WindowPadding, WindowPadding));
+		m_functionPanel->setColor(PanelClearColor);
 
 		m_editorPanel.addChild(m_functionPanel);
 	}
@@ -305,69 +307,56 @@ namespace Animation
 
 	void Editor::initializeAnimationPanel()
 	{
-		const float padding = 2.0f * m_padding;
-		const UI::Vec2 functionPanelSize = m_functionPanel->getSize();
-		const UI::Vec2 functionTotalSize = m_functionPanel->getSize() + UI::Vec2(padding, padding);
-		const UI::Vec2 panelSize(m_windowSize.x - padding, m_windowSize.y - functionTotalSize.y - m_padding);
+		const float padding = 2.0f * WindowPadding;
+		const UI::Vec2 panelSize(m_windowSize.x - padding, AnimPanelHeightInPercent * m_windowSize.y - WindowPadding);
 
 		m_animationPanel = new UI::Panel();
 		m_animationPanel->initialize();
 		m_animationPanel->setSize(panelSize);
-		m_animationPanel->setPosition(UI::Vec2(m_padding, functionPanelSize.y + padding));
-		m_animationPanel->setColor(m_panelClearColor);
+		m_animationPanel->setPosition(UI::Vec2(WindowPadding, m_functionPanel->getSize().y + padding));
+		m_animationPanel->setColor(PanelClearColor);
 
 		m_editorPanel.addChild(m_animationPanel);
+
+		initializeAnimationImages();
 	}
 
 	void Editor::initializeAnimationImages()
 	{
-		UI::Vec2 padding = UI::Vec2(m_imagePadding, m_imagePadding);
-
-		// Calculate the size of the images (must be a square)
-		float imageWidth = m_animationPanel->getSize().x / 2.0f - 1.5f * padding.x;
-		UI::Vec2 imageSize(imageWidth, imageWidth);
+		UI::Vec2 imageSize(m_animationPanel->getSize().y - PanelPadding * 2.0f, m_animationPanel->getSize().y - PanelPadding * 2.0f);
+		UI::Vec2 animationPosition = UI::Vec2(PanelPadding, PanelPadding);
+		UI::Vec2 texturePosition(m_animationPanel->getSize().x - PanelPadding - imageSize.x, PanelPadding);
 
 		// Create the animation image
-		UI::Vec2 animationPosition = padding;
-		m_animationImageUI = createAnimationImage(m_texture[SelectedImage::Animation], animationPosition, imageSize, [this](UI::MousePickerModule* _picker)
-			{
-				processSelectedPosition(SelectedImage::Animation, _picker);
-			});
-		m_animationImageUI->setTextureRect({ 0, 0, (int)m_animFrameSize.x, (int)m_animFrameSize.y });
-		m_imagePickers[SelectedImage::Animation] = m_animationImageUI->getFirstModuleOfType<UI::MousePickerModule>();
+		m_animationImageUI = createAnimationImage(SelectedImage::Animation, animationPosition, imageSize);
+		m_animationImageUI->setTextureRect({ 0, 0, (int32_t)m_animFrameSize.x, (int32_t)m_animFrameSize.y });
 
 		// Create the texture image
-		UI::Vec2 texturePosition((m_animationPanel->getSize().x + padding.x) * 0.5f, padding.y);
-		m_textureImageUI = createAnimationImage(m_texture[SelectedImage::Texture], texturePosition, imageSize, [this](UI::MousePickerModule* _picker)
-			{
-				processSelectedPosition(SelectedImage::Texture, _picker);
-			});
-		m_imagePickers[SelectedImage::Texture] = m_textureImageUI->getFirstModuleOfType<UI::MousePickerModule>();
+		m_textureImageUI = createAnimationImage(SelectedImage::Texture, texturePosition, imageSize);
 	}
 
-	UI::Image* Editor::createAnimationImage(sf::Texture* _tex, const UI::Vec2& _position, const UI::Vec2& _size, const std::function<void(UI::MousePickerModule*)>& _callback)
+	UI::Image* Editor::createAnimationImage(SelectedImage::SelectedImage _imageID, const UI::Vec2& _position, const UI::Vec2& _size)
 	{
+		UI::PickingZone pickingZone(_position + m_animationPanel->getPosition(), _size);
+
+		// Creating the image
 		UI::Image* image = new UI::Image();
 		image->initialize();
-		image->setTexture(_tex);
+		image->setTexture(m_texture[_imageID]);
 		image->setPosition(_position);
 		image->setSize(_size);
-		image->setClearColor(m_backgroundClearColor);
+		image->setClearColor(BackgroundClearColor);
 
-		UI::MousePickerModule* animationPicker = new UI::MousePickerModule();
+		// Creating the ImagePicker Module
+		m_imagePickers[_imageID] = new UI::MousePickerModule();
+		m_imagePickers[_imageID]->setSelectionCallback(std::bind(&Editor::processSelectedPosition, this, _imageID, m_imagePickers[_imageID]));
+		m_imagePickers[_imageID]->setPickingZone(pickingZone);
+		m_imagePickers[_imageID]->setSelectorSize({
+			_size.x / m_animFrameSize.x,
+			_size.y / m_animFrameSize.y
+			});
 
-		image->addModule(animationPicker);
-
-		UI::PickingZone pickingZone(_position + m_animationPanel->getPosition(), _size);
-		animationPicker->setPickingZone(pickingZone);
-		animationPicker->setSelectionCallback(std::bind(_callback, animationPicker));
-
-		UI::Vec2 pixelSize = _size;
-		pixelSize.x = pixelSize.x / m_animFrameSize.x;
-		pixelSize.y = pixelSize.y / m_animFrameSize.y;
-
-		animationPicker->setSelectorSize(pixelSize);
-
+		image->addModule(m_imagePickers[_imageID]);
 		m_animationPanel->addChild(image);
 
 		return image;
@@ -380,7 +369,7 @@ namespace Animation
 		m_previewPanel->initialize();
 		m_previewPanel->setSize(m_animationPanel->getSize());
 		m_previewPanel->setPosition(m_animationPanel->getPosition());
-		m_previewPanel->setClearColor(m_panelClearColor);
+		m_previewPanel->setClearColor(PanelClearColor);
 		m_previewPanel->setVisible(false);
 
 		AnimationData data
@@ -394,7 +383,7 @@ namespace Animation
 		m_spriteModule = new AnimatedSpriteModule(data);
 		AnimatedSprite& sprite = m_spriteModule->asSprite();
 
-		UI::Vec2 spritePosition = m_previewPanel->getSize() / 2.0f - UI::Vec2(m_padding, m_padding);
+		UI::Vec2 spritePosition = m_previewPanel->getSize() / 2.0f - UI::Vec2(WindowPadding, WindowPadding);
 		UI::Vec2 spriteSize = (UI::Vec2)sprite.getFrameSize();
 		float scale = m_previewPanel->getSize().y / (float)spriteSize.y;
 		UI::Vec2 origin = spriteSize * 0.5f;
