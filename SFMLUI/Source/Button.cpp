@@ -76,8 +76,14 @@ namespace UI
 
 	bool Button::contains(const Vec2& _point) const
 	{
-		sf::FloatRect rect = getTransform().transformRect(m_quad.getBounds());
-		return rect.contains(_point);
+		if (m_parent == nullptr)
+		{
+			sf::FloatRect rect = getTransform().transformRect(m_quad.getBounds());
+			return rect.contains(_point);
+		}
+
+		sf::FloatRect absoluteRect = m_parent->getTransform().transformRect(getTransform().transformRect(m_quad.getBounds()));
+		return absoluteRect.contains(_point);
 	}
 
 	void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const

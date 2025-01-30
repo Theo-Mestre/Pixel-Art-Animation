@@ -41,6 +41,9 @@ namespace UI
 
 		void setColor(const sf::Color& _color);
 
+		void setParent(sf::Transformable* _parent);
+		sf::Transformable* getParent() const;
+
 		// Modules
 		void addModule(Module* _module);
 		void updateModules(float deltaTime);
@@ -66,6 +69,7 @@ namespace UI
 		bool m_receiveEvents;
 		bool m_hovered;
 
+		sf::Transformable* m_parent;
 	public:
 		template <typename T>
 		T* getFirstModuleOfType() const

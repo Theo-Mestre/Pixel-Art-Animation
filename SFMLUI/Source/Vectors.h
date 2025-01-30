@@ -1,9 +1,7 @@
 #pragma once 
-#include <ostream>
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
-
 
 namespace UI
 {
@@ -14,8 +12,7 @@ namespace UI
 	using PickingZone = sf::FloatRect;
 }
 
-inline std::ostream& operator<<(std::ostream& os, const UI::Vec2& vec)
-{
-	os << "(" << vec.x << "; " << vec.y << ")";
-	return os;
-}
+std::ostream& operator<<(std::ostream& os, const UI::Vec2& vec);
+std::ostream& operator<<(std::ostream& os, const UI::Vec2i& vec);
+std::ostream& operator<<(std::ostream& os, const UI::Vec2u& vec);
+std::ostream& operator<<(std::ostream& os, const UI::PickingZone& vec);

@@ -56,6 +56,7 @@ namespace UI
 
 	void Panel::addChild(UIElement* _child, bool _hasOwnership)
 	{
+		_child->setParent(this);
 		m_children.push_back(std::make_pair(_child, _hasOwnership));
 	}
 
@@ -69,6 +70,8 @@ namespace UI
 			});
 
 		if (it == m_children.end()) return;
+
+		it->first->setParent(nullptr);
 
 		// Delete the child if the panel has ownership
 		if (it->second)

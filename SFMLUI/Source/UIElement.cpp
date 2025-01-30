@@ -76,6 +76,16 @@ namespace UI
 		}
 	}
 
+	void UIElement::setParent(sf::Transformable* _parent)
+	{
+		m_parent = _parent;
+	}
+
+	sf::Transformable* UIElement::getParent() const
+	{
+		return m_parent;
+	}
+
 	void UIElement::addModule(Module* _module)
 	{
 		_module->m_owner = this;
