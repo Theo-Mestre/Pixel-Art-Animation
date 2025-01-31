@@ -21,9 +21,6 @@ namespace UI
 
 	Image::~Image()
 	{
-		if (m_texture) return;
-
-		delete m_texture;
 		m_texture = nullptr;
 	}
 
@@ -53,7 +50,7 @@ namespace UI
 
 	void Image::setTexture(sf::Texture* _texture)
 	{
-		if (!_texture) return;
+		if (_texture == nullptr) return;
 
 		if (m_texture)
 		{

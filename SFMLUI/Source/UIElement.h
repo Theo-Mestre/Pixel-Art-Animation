@@ -40,9 +40,11 @@ namespace UI
 		bool isHovered() const;
 
 		void setColor(const sf::Color& _color);
+		void setTextureCoords(const sf::FloatRect& _rect);
 
-		void setParent(sf::Transformable* _parent);
-		sf::Transformable* getParent() const;
+		void setParent(UIElement* _parent);
+		UIElement* getParent() const;
+		const sf::Transform& getParentTransform() const;
 
 		// Modules
 		void addModule(Module* _module);
@@ -69,7 +71,7 @@ namespace UI
 		bool m_receiveEvents;
 		bool m_hovered;
 
-		sf::Transformable* m_parent;
+		UIElement* m_parent;
 	public:
 		template <typename T>
 		T* getFirstModuleOfType() const

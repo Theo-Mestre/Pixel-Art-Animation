@@ -17,6 +17,8 @@ namespace UI
 namespace Animation
 {
 	class AnimatedSpriteModule;
+	class FrameSelector;
+	class FunctionButtons;
 
 	// Contains the data needed to initialize and use the Editor
 	struct EditorData
@@ -57,7 +59,7 @@ namespace Animation
 		void setData(const EditorData& _editorData);
 
 	private:
-		void saveAnimationFile();
+		void saveAnimationFile(bool _overrideOriginalTexture = false);
 
 		void processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker);
 		void updateAnimationImage(const UI::Vec2i& _animCoord, const UI::Vec2i& _texCoord);
@@ -66,13 +68,13 @@ namespace Animation
 		void updateAnimationRect();
 
 		void OpenFile();
+		void TogglePreviewPanel();
 
 		// UI Initialization
 		void initializeUI();
 		void initializeTextures();
 		void initializeFunctionPanel();
 		void initializeFunctionButtons();
-		void initializeAnimEditionButtons();
 
 		void initializeAnimationPanel();
 		void initializeAnimationImages();
@@ -90,7 +92,7 @@ namespace Animation
 		sf::Vector2u m_textureSize;
 		UI::Vec2 m_animTotalSize;
 		UI::Vec2 m_animFrameSize;
-		UI::Vec2u m_selectedFrame;
+		UI::Vec2i m_selectedFrame;
 
 		// UI
 		UI::Panel m_editorPanel;
@@ -103,6 +105,12 @@ namespace Animation
 		UI::Image* m_textureImageUI = nullptr;
 		UI::MousePickerModule* m_imagePickers[SelectedImage::Count] = { nullptr };
 		sf::Texture* m_texture[SelectedImage::Count] = { nullptr };
+
+		// FunctionButtons
+		FunctionButtons* m_functionButtons = nullptr;
+
+		// FrameSelector
+		FrameSelector* m_frameSelector = nullptr;
 
 		// StyelSettings
 		sf::Font m_font;

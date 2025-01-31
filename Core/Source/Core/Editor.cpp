@@ -11,6 +11,8 @@
 #include "MousePickerModule.h"
 #include "Editor.h"
 #include "EditorLayoutSettings.h"
+#include "FrameSelector.h"
+#include "FunctionButtons.h"
 
 static constexpr uint8_t MaxColor = 255;
 
@@ -74,13 +76,20 @@ namespace Animation
 		m_data = _editorData;
 	}
 
-	void Editor::saveAnimationFile()
+	void Editor::saveAnimationFile(bool _overrideOriginalTexture)
 	{
 		updateImageData();
+		bool status = false;
 
-		bool status = m_animationImage.saveToFile(m_data.AnimationPath);
+		if (_overrideOriginalTexture)
+		{
+			status = m_animationImage.saveToFile(m_data.AnimationPath);
+			std::cout << (status ? "Animation saved successfully." : "Failed to save animation.") << std::endl;
+			return;
+		}
 
-		std::cout << (status ? "Animation saved successfully" : "Failed to save animation") << std::endl;
+		std::cout << "Save as file not implemented yet." << std::endl;
+
 	}
 
 #pragma region ImageProcessing
@@ -161,7 +170,7 @@ namespace Animation
 	{
 		std::string path = Utility::OpenFileDialog("Textures", "png");
 		if (path.empty()) return;
-		
+
 		if (!m_texture[0]->loadFromFile(path))
 		{
 			std::cout << "Failed to load texture: " << path << std::endl;
@@ -170,10 +179,19 @@ namespace Animation
 		updateImageData();
 	}
 
+	void Editor::TogglePreviewPanel()
+	{
+		m_animationPanel->setVisible(!m_animationPanel->isVisible());
+		m_previewPanel->setVisible(!m_previewPanel->isVisible());
+
+		// update the animation of the animated sprite
+		m_spriteModule->asSprite().setAnimation(*m_animationImageUI->getTexture());
+	}
+
 #pragma region UIInitialization
 	void Editor::initializeUI()
 	{
-		m_font.loadFromFile("Fonts/Font.otf");
+		m_font.loadFromFile("Fonts/Font.ttf");
 
 		initializeTextures();
 
@@ -182,13 +200,12 @@ namespace Animation
 		m_editorPanel.setSize(m_windowSize);
 		m_editorPanel.setColor(BackgroundClearColor);
 
+		// Initialize the animation panel
+		initializeAnimationPanel();
+
 		// Initialize the function panel
 		initializeFunctionPanel();
 		initializeFunctionButtons();
-		initializeAnimEditionButtons();
-
-		// Initialize the animation panel
-		initializeAnimationPanel();
 
 		// Initialize the preview panel
 		initializePreviewPanel();
@@ -217,9 +234,11 @@ namespace Animation
 
 	void Editor::initializeFunctionPanel()
 	{
-		float functionPanelHeight = m_windowSize.y * FunctionPanelHeightInPercent;
-		float padding = WindowPadding * 2.0f;
-		UI::Vec2 panelSize = UI::Vec2(m_windowSize.x - padding, functionPanelHeight - padding);
+		const UI::Vec2 panelSize = UI::Vec2
+		(
+			m_windowSize.x - 2.0f * WindowPadding,
+			m_windowSize.y * FunctionPanelHeightInPercent
+		);
 
 		m_functionPanel = new UI::Panel();
 		m_functionPanel->initialize();
@@ -232,86 +251,50 @@ namespace Animation
 
 	void Editor::initializeFunctionButtons()
 	{
-		const uint32_t buttonNumber = 3;
-		const float buttonPadding = 15.0f;
-		const float buttonHeight = 40.0f;
-		const char* buttonNames[buttonNumber] = { "Open", "Save", "Preview" };
-		const auto buttonSize = UI::Vec2((m_functionPanel->getSize().x - ((buttonNumber + 1) * buttonPadding)) / buttonNumber, buttonHeight);
-		auto buttonPosition = UI::Vec2(buttonPadding, buttonPadding);
+		// Initialize the frame selector
+		m_functionButtons = new FunctionButtons(m_windowSize);
+		m_functionButtons->initialize();
+		m_functionPanel->addChild(m_functionButtons);
+		m_functionButtons->setPosition(UI::Vec2(PanelPadding, PanelPadding));
+		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::SaveFile, [this]() { saveAnimationFile(true); });
+		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::SaveAsFile, [this]() { saveAnimationFile(); });
+		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::OpenFile, [this]() { OpenFile(); });
+		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::EditData, [this]() { std::cout << "Edit Data is not implemented yet." << std::endl; });
 
-		std::function<void()> buttonCallback[buttonNumber] =
-		{
-			[this]() { OpenFile(); },
-			[this]() { saveAnimationFile(); },
-			[this]()
-			{
-				m_animationPanel->setVisible(!m_animationPanel->isVisible());
-				m_previewPanel->setVisible(!m_previewPanel->isVisible());
+		// Initialize the frame selector
+		m_frameSelector = new FrameSelector(m_windowSize);
+		m_functionPanel->addChild(m_frameSelector);
 
-				// update the animation of the animated sprite
-				m_spriteModule->asSprite().setAnimation(*m_animationImageUI->getTexture());
-			}
-		};
+		m_frameSelector->setFont(&m_font);
+		m_frameSelector->initialize();
+		m_frameSelector->setPosition(UI::Vec2(m_frameSelector->getPosition().x + m_frameSelector->getSize().x + 2.0f * PanelPadding, PanelPadding));
+		m_frameSelector->setSelectedFrameData(&m_selectedFrame, m_data.AnimationCount);
+		m_frameSelector->setOnSelectedFrameChangedCallback([this]() { updateAnimationRect(); });
 
-		for (size_t i = 0; i < buttonNumber; i++)
-		{
-			buttonPosition.x = buttonPadding + (buttonSize.x + buttonPadding) * i;
+		// Preview Button
+		// TODO: Move magic numbers to a layout settings file
+		UI::Button* previewButton = new UI::Button();
+		previewButton->initialize();
+		previewButton->setSize({ 100.0f, 50.0f });
+		previewButton->setPosition({ m_functionPanel->getSize().x - 100.0f - PanelPadding, PanelPadding });
+		previewButton->setCallback([this]() { TogglePreviewPanel(); });
 
-			UI::Button* button = new UI::Button();
-			button->setSize(buttonSize);
-			button->setPosition(buttonPosition);
-			button->setCallback(buttonCallback[i]);
-
-			UI::TextModule* text = new UI::TextModule(buttonNames[i]);
-			text->setFont(&m_font);
-			text->setColor(sf::Color::Black);
-			button->addModule(text);
-			text->setTextCentered();
-
-			m_functionPanel->addChild(button);
-		}
+		m_functionPanel->addChild(previewButton);
 	}
 
-	void Editor::initializeAnimEditionButtons()
-	{
-		// Add / remove frame buttons
-		const float buttonPadding = 15.0f;
-		const float yPosition = buttonPadding * 2.0f + 40.0f;
-		const UI::Vec2 buttonSize = { 100.0f, 50.0f };
-
-		// Next Frame Button
-		UI::Button* nextFrameButton = new UI::Button();
-
-		nextFrameButton->setSize(buttonSize);
-		nextFrameButton->setPosition(UI::Vec2(m_functionPanel->getSize().x - buttonSize.x - buttonPadding, yPosition));
-
-		UI::TextModule* nextFrameText = new UI::TextModule("Next Frame");
-		nextFrameText->setFont(&m_font);
-		nextFrameButton->addModule(nextFrameText);
-		nextFrameText->setTextCentered();
-
-		nextFrameButton->setCallback([this, nextFrameText]()
-			{
-				m_selectedFrame.x = ++m_selectedFrame.x % m_data.AnimationCount.x;
-
-				nextFrameText->setText("Next Frame: " + std::to_string(m_selectedFrame.x));
-				updateAnimationRect();
-			});
-
-
-
-		m_functionPanel->addChild(nextFrameButton);
-	}
-
+#pragma region AnimationPanel
 	void Editor::initializeAnimationPanel()
 	{
-		const float padding = 2.0f * WindowPadding;
-		const UI::Vec2 panelSize(m_windowSize.x - padding, AnimPanelHeightInPercent * m_windowSize.y - WindowPadding);
+		const UI::Vec2 panelSize = UI::Vec2
+		(
+			m_windowSize.x - 2.0f * WindowPadding,
+			AnimPanelHeightInPercent * m_windowSize.y
+		);
 
 		m_animationPanel = new UI::Panel();
 		m_animationPanel->initialize();
 		m_animationPanel->setSize(panelSize);
-		m_animationPanel->setPosition(UI::Vec2(WindowPadding, m_functionPanel->getSize().y + padding));
+		m_animationPanel->setPosition(UI::Vec2(WindowPadding, m_windowSize.y - (panelSize.y + WindowPadding)));
 		m_animationPanel->setColor(PanelClearColor);
 
 		m_editorPanel.addChild(m_animationPanel);
@@ -361,7 +344,9 @@ namespace Animation
 
 		return image;
 	}
+#pragma endregion
 
+#pragma region PreviewPanel
 	void Editor::initializePreviewPanel()
 	{
 		m_previewPanel = new UI::PanelRenderer();
@@ -396,5 +381,6 @@ namespace Animation
 
 		m_editorPanel.addChild(m_previewPanel);
 	}
+#pragma endregion 
 #pragma endregion 
 }

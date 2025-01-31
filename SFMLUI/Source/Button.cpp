@@ -82,8 +82,16 @@ namespace UI
 			return rect.contains(_point);
 		}
 
-		sf::FloatRect absoluteRect = m_parent->getTransform().transformRect(getTransform().transformRect(m_quad.getBounds()));
-		return absoluteRect.contains(_point);
+        sf::FloatRect absoluteRect = getTransform().transformRect(m_quad.getBounds());
+        UIElement* parent = m_parent;
+
+        while (parent != nullptr && parent->getParent() != nullptr)
+        {
+			absoluteRect = parent->getTransform().transformRect(absoluteRect);
+			parent = parent->getParent();
+        }
+
+        return absoluteRect.contains(_point);
 	}
 
 	void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const

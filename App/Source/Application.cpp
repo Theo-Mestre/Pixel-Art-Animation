@@ -5,9 +5,9 @@
 #include "Application.h"
 
 constexpr const char* TEXTURE_PATH = "Texture.png";
-constexpr const char* ANIMATION_PATH = "AnimationFull.png";
+constexpr const char* ANIMATION_PATH = "AnimationCombine.png";
 constexpr uint32_t ANIM_COUNT_X = 6;
-constexpr uint32_t ANIM_COUNT_Y = 1;
+constexpr uint32_t ANIM_COUNT_Y = 2;
 
 Application::Application()
 	: m_window(nullptr)
@@ -50,7 +50,7 @@ bool Application::isRunning() const
 
 void Application::OnInitialize()
 {
-	m_window = new sf::RenderWindow(sf::VideoMode(1080, 720), "App");
+	m_window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Animation Editor"/*, sf::Style::Fullscreen*/);
 
 	Animation::EditorData editorData;
 	editorData.Window = m_window;

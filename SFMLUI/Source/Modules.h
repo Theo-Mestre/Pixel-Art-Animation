@@ -2,6 +2,8 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
 
+#include "Vectors.h"
+
 namespace sf
 {
 	class Event;
@@ -32,7 +34,7 @@ namespace UI
 	public:
 		TextModule();
 		TextModule(const std::string& _text);
-		virtual ~TextModule() = default;
+		virtual ~TextModule();
 
 		virtual void update(float _deltaTime) override;
 
@@ -41,11 +43,17 @@ namespace UI
 		void setColor(const sf::Color& color);
 		void setTextCentered();
 
+		void setSize(const UI::Vec2& _size);
+
+		sf::Text& getText();
 		sf::Text& operator()();
+
 	private:
 		void draw(sf::RenderTarget& _target, sf::RenderStates _states) const override;
 
 	private:
 		sf::Text m_text;
+
+		UI::Vec2 m_size;
 	};
 }

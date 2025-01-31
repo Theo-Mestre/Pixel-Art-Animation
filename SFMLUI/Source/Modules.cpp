@@ -11,6 +11,8 @@ namespace UI
 
 	TextModule::TextModule()
 		: Module()
+		, m_text()
+		, m_size()
 	{
 		setColor(sf::Color::Black);
 	}
@@ -19,6 +21,10 @@ namespace UI
 		: TextModule()
 	{
 		setText(_text);
+	}
+
+	TextModule::~TextModule()
+	{
 	}
 
 	void TextModule::setText(const std::string& text)
@@ -39,11 +45,22 @@ namespace UI
 	void TextModule::setTextCentered()
 	{
 		m_text.setOrigin(m_text.getLocalBounds().width / 2.0f, m_text.getLocalBounds().height / 1.25f);
-		m_text.setPosition(m_owner->getSize() / 2.0f);
+
+		m_text.setPosition(m_owner->getPosition() + m_owner->getSize() / 2.0f);
+	}
+
+	void TextModule::setSize(const UI::Vec2& _size)
+	{
+		m_size = _size;
 	}
 
 	void TextModule::update(float _deltaTime)
 	{
+	}
+
+	sf::Text& TextModule::getText()
+	{
+		return m_text;
 	}
 
 	sf::Text& TextModule::operator()()

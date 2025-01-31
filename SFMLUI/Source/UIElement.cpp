@@ -11,6 +11,7 @@ namespace UI
 		, m_visible(true)
 		, m_receiveEvents(true)
 		, m_hovered(false)
+		, m_parent(nullptr)
 	{
 	}
 
@@ -76,14 +77,30 @@ namespace UI
 		}
 	}
 
-	void UIElement::setParent(sf::Transformable* _parent)
+	void UIElement::setTextureCoords(const sf::FloatRect& _rect)
+	{
+		m_quad[0].texCoords = Vec2(_rect.left, _rect.top);
+		m_quad[1].texCoords = Vec2(_rect.left + _rect.width, _rect.top);
+		m_quad[2].texCoords = Vec2(_rect.left + _rect.width, _rect.top + _rect.height);
+		m_quad[3].texCoords = Vec2(_rect.left, _rect.top + _rect.height);
+	}
+
+	void UIElement::setParent(UIElement* _parent)
 	{
 		m_parent = _parent;
 	}
 
-	sf::Transformable* UIElement::getParent() const
+	UIElement* UIElement::getParent() const
 	{
 		return m_parent;
+	}
+
+	const sf::Transform& UIElement::getParentTransform() const
+	{
+		if (m_parent == nullptr) return getTransform();
+
+		// return combined transform
+		return m_parent->getTransform() * getTransform();
 	}
 
 	void UIElement::addModule(Module* _module)
