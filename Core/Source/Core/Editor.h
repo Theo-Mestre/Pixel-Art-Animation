@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <functional>
 
 #include "SFML/Graphics.hpp"
 
@@ -57,7 +58,7 @@ namespace Animation
 
 		// Set the Editor Data 
 		void setData(const EditorData& _editorData);
-
+		void setResetCallback(const std::function<void(EditorData*)>& _callback) { m_onReset = _callback; }
 	private:
 		void saveAnimationFile(bool _overrideOriginalTexture = false);
 
@@ -67,7 +68,7 @@ namespace Animation
 		sf::Color getCoordColor(const UI::Vec2i& _position);
 		void updateAnimationRect();
 
-		void OpenFile();
+		void OpenTextureFile(SelectedImage::SelectedImage _texID);
 		void TogglePreviewPanel();
 
 		// UI Initialization
@@ -104,7 +105,7 @@ namespace Animation
 		UI::Image* m_animationImageUI = nullptr;
 		UI::Image* m_textureImageUI = nullptr;
 		UI::MousePickerModule* m_imagePickers[SelectedImage::Count] = { nullptr };
-		sf::Texture* m_texture[SelectedImage::Count] = { nullptr };
+		sf::Texture* m_textures[SelectedImage::Count] = { nullptr };
 
 		// FunctionButtons
 		FunctionButtons* m_functionButtons = nullptr;
@@ -114,5 +115,7 @@ namespace Animation
 
 		// StyelSettings
 		sf::Font m_font;
+
+		std::function<void(EditorData*)> m_onReset;
 	};
 }

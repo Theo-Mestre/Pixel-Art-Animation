@@ -33,6 +33,11 @@ namespace Animation
 		};
 		setSize(panelSize);
 
+		for (size_t i = 0; i < ButtonType::Count; i++)
+		{
+			m_texture[i].loadFromFile(IconsPath[i]);
+		}
+
 		panelSize = (panelSize - UI::Vec2(PanelPadding, PanelPadding)) * 0.5f;
 
 		initializeButtons(panelSize);
@@ -71,6 +76,7 @@ namespace Animation
 			m_buttons[i] = new UI::Button();
 			m_buttons[i]->setSize(_size);
 			m_buttons[i]->setPosition(positions[i]);
+			m_buttons[i]->setTexture(&m_texture[i]);
 			addChild(m_buttons[i]);
 		}
 	}

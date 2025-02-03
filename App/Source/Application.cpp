@@ -12,6 +12,8 @@ constexpr uint32_t ANIM_COUNT_Y = 2;
 Application::Application()
 	: m_window(nullptr)
 	, m_editor(nullptr)
+	, m_newEditorData(nullptr)
+	, m_requireEditorReset(true)
 {
 }
 
@@ -29,6 +31,8 @@ void Application::Run()
 
 	while (isRunning())
 	{
+		if (m_requireEditorReset) CreateEditor();
+
 		deltaTime = clock.restart().asSeconds();
 
 		while (m_window->pollEvent(event)) OnEvent(event);
@@ -58,8 +62,9 @@ void Application::OnInitialize()
 	editorData.AnimationPath = ANIMATION_PATH;
 	editorData.TexturePath = TEXTURE_PATH;
 
-	m_editor = new Animation::Editor(editorData);
-	m_editor->initialize();
+	m_newEditorData = &editorData;
+	CreateEditor();
+	m_newEditorData = nullptr;
 }
 
 void Application::OnEvent(const sf::Event& _event)
@@ -86,4 +91,29 @@ void Application::OnShutdown()
 
 	delete m_editor;
 	m_editor = nullptr;
+}
+
+void Application::RequireEditorReset(Animation::EditorData* _editorData)
+{
+	m_newEditorData = _editorData;
+	m_requireEditorReset = true;
+}
+
+void Application::CreateEditor()
+{
+	std::cout << "Creating the editor." << std::endl;
+
+	if (!m_requireEditorReset) return;
+
+	Animation::EditorData editorData = *m_newEditorData;
+
+	if (m_editor != nullptr) delete m_editor;
+
+	m_editor = new Animation::Editor(editorData);
+	m_editor->setResetCallback([this](Animation::EditorData* _data) { RequireEditorReset(_data); });
+	m_editor->initialize();
+
+	m_requireEditorReset = false;
+
+	std::cout << "Editor created." << std::endl;
 }

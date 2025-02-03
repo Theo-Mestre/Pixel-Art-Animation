@@ -36,7 +36,7 @@ namespace Animation
 	private:
 		void initializeButtons(const UI::Vec2& _size);
 	private:
-		sf::Texture m_texture;
+		sf::Texture m_texture[ButtonType::Count];
 
 		UI::Vec2 m_windowSize;
 

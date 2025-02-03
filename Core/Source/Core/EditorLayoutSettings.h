@@ -21,6 +21,17 @@ namespace Animation
 
 		// Frame Selector
 		constexpr float FrameSelectorHeightInPercent = 265 * 100 / 1080 * 0.01;
-		constexpr const char* FrameSelectorTexturePath = "Arrows.png";
+		constexpr const char* FrameSelectorTexturePath = "Textures/Arrows.png";
+
+		constexpr const char* FontPath = "Fonts/Font.ttf";
+
+		// Function Buttons
+		constexpr const char* IconsPath[4] =
+		{
+			"Textures/SaveIcon.png",
+			"Textures/OpenIcon.png",
+			"Textures/SaveAsIcon.png",
+			"Textures/EditIcon.png"
+		};
 	}
 }
