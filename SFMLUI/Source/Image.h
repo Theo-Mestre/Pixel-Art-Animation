@@ -16,7 +16,7 @@ namespace UI
 	{
 	public:
 		Image();
-		~Image();
+		virtual ~Image();
 
 		void initialize() override;
 		void receiveEvent(const sf::Event& _event) override;

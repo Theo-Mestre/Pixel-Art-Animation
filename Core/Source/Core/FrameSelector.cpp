@@ -45,6 +45,7 @@ namespace Animation
 
 		UI::Panel* middlePanel = new UI::Panel();
 		middlePanel->initialize();
+		middlePanel->setColor(ButtonColor);
 		middlePanel->setSize((panelSize - UI::Vec2(PanelPadding, PanelPadding)) * 2.0f);
 		middlePanel->setPosition(panelSize + UI::Vec2(PanelPadding, PanelPadding));
 		addChild(middlePanel);
@@ -124,6 +125,7 @@ namespace Animation
 			button[i] = new UI::Button();
 			button[i]->initialize();
 			button[i]->setSize(_size);
+			button[i]->setColor(ButtonColor);
 			button[i]->setPosition(position[i]);
 			button[i]->setTexture(&m_texture);
 			button[i]->setTextureCoords(textureRect[i]);
@@ -144,7 +146,8 @@ namespace Animation
 
 		m_textModule->setFont(m_font);
 		m_textModule->setSize(_size);
-		m_textModule->getText().setCharacterSize(20);
+		m_textModule->getText().setCharacterSize(25);
+		m_textModule->getText().setFillColor(LabelColor);
 		m_textModule->setTextCentered();
 	}
 

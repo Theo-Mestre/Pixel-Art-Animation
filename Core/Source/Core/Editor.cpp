@@ -2,15 +2,17 @@
 
 #include "FileUtility.h"
 
-#include "Button.h"
 #include "Image.h"
-#include "PanelRenderer.h"
+#include "Label.h"
+#include "Button.h"
 #include "Modules.h"
+#include "PanelRenderer.h"
 
 #include "AnimatedSpriteModule.h"
 #include "EditorLayoutSettings.h"
 #include "MousePickerModule.h"
 #include "FunctionButtons.h"
+#include "EditorDataPanel.h"
 #include "FrameSelector.h"
 #include "Editor.h"
 
@@ -36,6 +38,8 @@ namespace Animation
 		m_animationImageUI = nullptr;
 
 		m_spriteModule = nullptr;
+
+		m_editorDataPanel = nullptr;
 
 		for (auto texture : m_textures)
 		{
@@ -169,7 +173,7 @@ namespace Animation
 	{
 		if (_texID < 0 || _texID >= SelectedImage::Count) return;
 
-		std::string path = Utility::OpenFileDialog("Textures", "png");
+		std::string path = Utility::OpenFileDialog("Animation File", "anim");
 		if (path.empty()) return;
 
 		auto& texPath = _texID == SelectedImage::Animation ? m_data.AnimationPath : m_data.TexturePath;
@@ -184,11 +188,37 @@ namespace Animation
 
 	void Editor::TogglePreviewPanel()
 	{
-		m_animationPanel->setVisible(!m_animationPanel->isVisible());
-		m_previewPanel->setVisible(!m_previewPanel->isVisible());
+		if (m_editorDataPanel->isVisible()) return;
 
-		// update the animation of the animated sprite
-		m_spriteModule->asSprite().setAnimation(*m_animationImageUI->getTexture());
+		bool isVisible = m_previewPanel->isVisible();
+
+		m_previewPanel->setVisible(!isVisible);
+
+		m_animationPanel->setVisible(isVisible);
+
+		if (!isVisible == true)
+		{
+			// update the animation of the animated sprite
+			m_spriteModule->asSprite().setAnimation(*m_animationImageUI->getTexture());
+		}
+	}
+
+	void Editor::ToggleEditorDataPanel()
+	{
+		bool isVisible = m_editorDataPanel->isVisible();
+
+		if (isVisible && m_onReset != nullptr)
+		{
+				std::cout << "Resetting the editor." << std::endl;
+				m_onReset(&m_data);
+				return;
+		}
+
+		m_editorDataPanel->setVisible(!isVisible);
+		m_editorDataPanel->UpdateData();
+
+		m_animationPanel->setVisible(isVisible);
+		m_previewPanel->setVisible(false);
 	}
 
 #pragma region UIInitialization
@@ -212,6 +242,9 @@ namespace Animation
 
 		// Initialize the preview panel
 		initializePreviewPanel();
+
+		// Initialize the editor data panel
+		initializeEditorDataPanel();
 	}
 
 	void Editor::initializeTextures()
@@ -263,7 +296,7 @@ namespace Animation
 		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::SaveFile, [this]() { saveAnimationFile(true); });
 		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::SaveAsFile, [this]() { saveAnimationFile(); });
 		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::OpenFile, [this]() { OpenTextureFile(SelectedImage::Animation); });
-		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::EditData, [this]() { std::cout << "Edit Data is not implemented yet." << std::endl; });
+		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::EditData, [this]() { ToggleEditorDataPanel(); });
 
 		// Initialize the frame selector
 		m_frameSelector = new FrameSelector(m_windowSize);
@@ -276,14 +309,31 @@ namespace Animation
 		m_frameSelector->setOnSelectedFrameChangedCallback([this]() { updateAnimationRect(); });
 
 		// Preview Button
-		// TODO: Move magic numbers to a layout settings file
+		UI::Vec2 size = { PreviewButtonWidthInPercent, PreviewButtonHeightInPercent };
+		size.x *= m_windowSize.x;
+		size.y *= m_windowSize.y;
+
 		UI::Button* previewButton = new UI::Button();
 		previewButton->initialize();
-		previewButton->setSize({ 100.0f, 50.0f });
-		previewButton->setPosition({ m_functionPanel->getSize().x - 100.0f - PanelPadding, PanelPadding });
+		previewButton->setSize(size);
+		previewButton->setColor(ButtonColor);
+		previewButton->setPosition({ m_functionPanel->getSize().x - size.x - PanelPadding, PanelPadding });
 		previewButton->setCallback([this]() { TogglePreviewPanel(); });
 
+		UI::Vec2 labelPosition = previewButton->getPosition();
+		labelPosition.x += PanelPadding;
+		labelPosition.y += size.y * 0.2f;
+
+		UI::Label* previewLabel = new UI::Label();
+		previewLabel->initialize();
+		previewLabel->setString(PreviewButtonText);
+		previewLabel->setFont(m_font);
+		previewLabel->setTextColor(LabelColor);
+		previewLabel->setOrigin({ 0.0f, previewLabel->getSize().y / 2.0f });
+		previewLabel->setPosition(labelPosition);
+
 		m_functionPanel->addChild(previewButton);
+		m_functionPanel->addChild(previewLabel);
 	}
 
 #pragma region AnimationPanel
@@ -291,7 +341,7 @@ namespace Animation
 	{
 		const UI::Vec2 panelSize = UI::Vec2(
 			m_windowSize.x - 2.0f * WindowPadding,
-			AnimPanelHeightInPercent * m_windowSize.y
+			EditorDataPanelHeightInPercent * m_windowSize.y
 		);
 
 		m_animationPanel = new UI::Panel();
@@ -383,6 +433,27 @@ namespace Animation
 		m_previewPanel->addModule(m_spriteModule);
 
 		m_editorPanel.addChild(m_previewPanel);
+	}
+
+	void Editor::initializeEditorDataPanel()
+	{
+		const UI::Vec2 panelSize = UI::Vec2(
+			m_windowSize.x - 2.0f * WindowPadding,
+			AnimPanelHeightInPercent * m_windowSize.y
+		);
+
+		m_editorDataPanel = new EditorDataPanel();
+
+		m_editorDataPanel->setColor(PanelClearColor);
+		m_editorDataPanel->setSize(panelSize);
+		m_editorDataPanel->setPosition(UI::Vec2(WindowPadding, m_windowSize.y - (panelSize.y + WindowPadding)));
+		m_editorDataPanel->setData(&m_data);
+		m_editorDataPanel->initialize();
+		m_editorDataPanel->setTextFont(m_font);
+		m_editorDataPanel->UpdateData();
+		m_editorDataPanel->setVisible(false);
+
+		m_editorPanel.addChild(m_editorDataPanel);
 	}
 #pragma endregion 
 #pragma endregion 

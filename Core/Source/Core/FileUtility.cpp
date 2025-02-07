@@ -7,14 +7,25 @@
 
 namespace Utility
 {
-    std::wstring StringToWString(const std::string& _str)
+    static std::wstring StringToWString(const std::string& _str)
     {
         return std::wstring(_str.begin(), _str.end());
     }
 
-    std::string WStringToString(const std::wstring& _wstr)
+    static std::string WStringToString(const std::wstring& _wstr)
     {
         return std::string(_wstr.begin(), _wstr.end());
+    }
+
+    std::string TruncatePath(const std::string& _path)
+    {
+		std::string truncatedPath = _path;
+		size_t pos = _path.find_last_of("\\");
+		if (pos != std::string::npos)
+		{
+			truncatedPath = "..." + _path.substr(pos, _path.size());
+		}
+		return truncatedPath;
     }
 
     std::string OpenFileDialog(const std::string& _fileType, const std::string& _extension)

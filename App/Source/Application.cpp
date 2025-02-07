@@ -54,7 +54,7 @@ bool Application::isRunning() const
 
 void Application::OnInitialize()
 {
-	m_window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Animation Editor"/*, sf::Style::Fullscreen*/);
+	m_window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Animation Editor");
 
 	Animation::EditorData editorData;
 	editorData.Window = m_window;
@@ -101,8 +101,6 @@ void Application::RequireEditorReset(Animation::EditorData* _editorData)
 
 void Application::CreateEditor()
 {
-	std::cout << "Creating the editor." << std::endl;
-
 	if (!m_requireEditorReset) return;
 
 	Animation::EditorData editorData = *m_newEditorData;
@@ -114,6 +112,4 @@ void Application::CreateEditor()
 	m_editor->initialize();
 
 	m_requireEditorReset = false;
-
-	std::cout << "Editor created." << std::endl;
 }

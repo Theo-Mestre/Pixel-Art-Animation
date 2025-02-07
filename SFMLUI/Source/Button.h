@@ -22,8 +22,18 @@ namespace UI
 		void setCallback(std::function<void()> _callback);
 		void setTexture(sf::Texture* _texture);
 		
+		void setColor(const sf::Color& _color);
+		void setHoveredColorDelta(const sf::Color& _color);
+		void setClickedColorDelta(const sf::Color& _color);
+
+		sf::Color getColor() const;
+		sf::Color getHoveredColorDelta() const;
+		sf::Color getClickedColorDelta() const;
+
 	protected:
 		virtual void onSizeChanged() override;
+
+		void UpdateVertexColors();
 
 	private:
 		bool contains(const Vec2& _point) const;
@@ -33,5 +43,8 @@ namespace UI
 		sf::Texture* m_texture;
 
 		std::function<void()> m_callback;
+		sf::Color m_color;
+		sf::Color m_hoverdColorDelta;
+		sf::Color m_clickedColorDelta;
 	};
 }

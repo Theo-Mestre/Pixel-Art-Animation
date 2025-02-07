@@ -10,6 +10,9 @@ namespace UI
 		: UIElement()
 		, m_texture(nullptr)
 		, m_callback(nullptr)
+		, m_color(sf::Color::White)
+		, m_hoverdColorDelta(sf::Color(25, 25, 25, 0))
+		, m_clickedColorDelta(sf::Color(50, 50, 50, 0))
 	{
 
 	}
@@ -22,6 +25,7 @@ namespace UI
 
 	void Button::initialize()
 	{
+		UpdateVertexColors();
 	}
 
 	void Button::receiveEvent(const sf::Event& _event)
@@ -31,6 +35,7 @@ namespace UI
 		{
 			Vec2 mousePos = Vec2(_event.mouseMove.x, _event.mouseMove.y);
 			m_hovered = contains(mousePos);
+			UpdateVertexColors();
 		}
 
 		// return if the event isn't a mouse button press
@@ -44,6 +49,7 @@ namespace UI
 				m_callback();
 			}
 		}
+		UpdateVertexColors();
 
 		handleEventModules(_event);
 	}
@@ -67,11 +73,62 @@ namespace UI
 		updateTextureCoords((Vec2)m_texture->getSize());
 	}
 
+	void Button::setColor(const sf::Color& _color)
+	{
+		m_color = _color;
+		UpdateVertexColors();
+	}
+
+	void Button::setHoveredColorDelta(const sf::Color& _color)
+	{
+		m_hoverdColorDelta = _color;
+	}
+
+	void Button::setClickedColorDelta(const sf::Color& _color)
+	{
+		m_clickedColorDelta = _color;
+	}
+
+	sf::Color Button::getColor() const
+	{
+		return m_color;
+	}
+
+	sf::Color Button::getHoveredColorDelta() const
+	{
+		return m_hoverdColorDelta;
+	}
+
+	sf::Color Button::getClickedColorDelta() const
+	{
+		return m_clickedColorDelta;
+	}
+
 	void Button::onSizeChanged()
 	{
 		m_quad[1].position = Vec2(m_size.x, 0.0f);
 		m_quad[2].position = Vec2(m_size.x, m_size.y);
 		m_quad[3].position = Vec2(0.0f, m_size.y);
+	}
+
+	void Button::UpdateVertexColors()
+	{
+		sf::Color color = m_color;
+
+		if (m_hovered)
+		{
+			color -= m_hoverdColorDelta;
+		}
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && m_hovered)
+		{
+			color -= m_clickedColorDelta;
+		}
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			m_quad[i].color = color;
+		}
 	}
 
 	bool Button::contains(const Vec2& _point) const

@@ -20,6 +20,7 @@ namespace Animation
 	class AnimatedSpriteModule;
 	class FrameSelector;
 	class FunctionButtons;
+	class EditorDataPanel;
 
 	// Contains the data needed to initialize and use the Editor
 	struct EditorData
@@ -59,6 +60,7 @@ namespace Animation
 		// Set the Editor Data 
 		void setData(const EditorData& _editorData);
 		void setResetCallback(const std::function<void(EditorData*)>& _callback) { m_onReset = _callback; }
+
 	private:
 		void saveAnimationFile(bool _overrideOriginalTexture = false);
 
@@ -70,6 +72,7 @@ namespace Animation
 
 		void OpenTextureFile(SelectedImage::SelectedImage _texID);
 		void TogglePreviewPanel();
+		void ToggleEditorDataPanel();
 
 		// UI Initialization
 		void initializeUI();
@@ -82,6 +85,8 @@ namespace Animation
 		UI::Image* createAnimationImage(SelectedImage::SelectedImage _imageID, const UI::Vec2& _position, const UI::Vec2& _size);
 
 		void initializePreviewPanel();
+
+		void initializeEditorDataPanel();
 	private:
 		AnimatedSpriteModule* m_spriteModule;
 
@@ -112,6 +117,9 @@ namespace Animation
 
 		// FrameSelector
 		FrameSelector* m_frameSelector = nullptr;
+
+		// EditorDataPanel
+		EditorDataPanel* m_editorDataPanel = nullptr;
 
 		// StyelSettings
 		sf::Font m_font;
