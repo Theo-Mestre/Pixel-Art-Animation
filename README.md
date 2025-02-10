@@ -25,6 +25,52 @@ Include the `AnimatedSprite` class in your project to integrate animations. The 
 - Updating animation frames based on a timer.
 - Rendering animations using mapped texture coordinates.
 
+#### Example
+
+```c++
+#include "AnimatedSprite.h"
+
+int main()
+{
+	sf::RenderWindow window(sf::VideoMode(800, 600), "Animated Sprite");
+	sf::Event event;
+	sf::Clock clock;
+	float deltaTime = 0.0f;
+
+	Animation::AnimationData data
+	{
+		"AnimationName", // Animation file
+		"TextureName", // Texture file
+		{ 6, 1 }, // Frame number
+		0.1f // Frame duration
+	};
+	Animation::AnimatedSprite sprite(data); // Create the animated sprite
+
+	// The sprite can be initialized with the data after creation
+	//sprite.initialize(data); 
+
+	while (window.isOpen())
+	{
+		deltaTime = clock.restart().asSeconds();
+
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed) window.close();
+		}
+
+		// Update the sprite
+		sprite.update(deltaTime);
+
+		window.clear();
+
+		// Draw the sprite
+		window.draw(sprite);
+
+		window.display();
+	}
+}
+```
+
 #### Editor
 Run the editor to create or modify animation mappings for your texture. Once completed, save the mappings to integrate them into your game or project.
 
