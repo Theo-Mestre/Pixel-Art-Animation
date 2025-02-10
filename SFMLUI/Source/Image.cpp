@@ -7,9 +7,34 @@
 
 namespace UI
 {
+	static const char* s_vertexShader = R"(
+		void main()
+		{
+		    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+		
+		    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+		
+		    gl_FrontColor = gl_Color;
+		})";
+
+	static const char* s_fragmentShader = R"(
+		uniform sampler2D u_texture;
+		uniform vec4 u_clearColor;
+		
+		void main()
+		{
+		    vec4 pixel = texture2D(u_texture, gl_TexCoord[0].xy);
+		
+		    if (pixel.a == 0.0)
+		    {
+		        gl_FragColor = u_clearColor;
+		        return;
+		    }
+		
+		    gl_FragColor = pixel * gl_Color;
+		})";
+
 	static sf::Shader s_shader;
-	static const char* s_shaderVertName = "Shaders/Image.vert";
-	static const char* s_shaderFragName = "Shaders/Image.frag";
 
 	Image::Image()
 		: UIElement()
@@ -28,7 +53,7 @@ namespace UI
 	{
 		if (s_shader.getNativeHandle() != 0) return;
 
-		if (!s_shader.loadFromFile(s_shaderVertName, s_shaderFragName))
+		if (!s_shader.loadFromMemory(s_vertexShader, s_fragmentShader))
 		{
 			std::cout << "Failed to load shader" << std::endl;
 		}

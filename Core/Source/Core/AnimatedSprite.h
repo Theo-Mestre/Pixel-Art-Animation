@@ -15,10 +15,13 @@ namespace Animation
 	class AnimatedSprite
 		: public sf::Drawable, public sf::Transformable
 	{
-	public:	
+	public:
 		AnimatedSprite();
 		AnimatedSprite(AnimationData _data);
 		~AnimatedSprite();
+
+		void initialize(AnimationData _data);
+		void update(float _deltaTime);
 
 #pragma region Accessors
 		inline void setTexture(const sf::Texture& _texture) { m_texture = _texture; }
@@ -41,9 +44,6 @@ namespace Animation
 		inline float getFrameDuration() const { return m_frameDuration; }
 		inline float getElapsedTime() const { return m_elapsedTime; }
 #pragma endregion
-
-		void initialize(AnimationData _data);
-		void update(float _deltaTime);
 
 	private:
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;

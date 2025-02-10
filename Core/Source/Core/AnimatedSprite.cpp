@@ -3,6 +3,28 @@
 
 namespace Animation
 {
+	constexpr const char* s_vertexShader = R"(
+		void main()
+		{
+			gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+			gl_FrontColor = gl_Color;
+			gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+		})";
+
+	constexpr const char* s_fragmentShader = R"(
+		uniform sampler2D u_texture;
+		uniform sampler2D u_animation;
+		
+		void main()
+		{
+		    vec4 pixelCoord = texture2D(u_animation, gl_TexCoord[0].xy);
+		    vec2 coord = pixelCoord.xy;
+		
+		    vec4 finalColor = texture2D(u_texture, coord + 0.01);
+		
+		    gl_FragColor = gl_Color * finalColor * vec4(1, 1, 1, pixelCoord.a);
+		})";
+
 	AnimatedSprite::AnimatedSprite()
 		: m_frameSize(0, 0)
 		, m_frameNumber(0, 0)
@@ -13,7 +35,7 @@ namespace Animation
 		m_vertices.setPrimitiveType(sf::Quads);
 		m_vertices.resize(4);
 
-		m_shader.loadFromFile("Shaders/AnimatedSprite.vert", "Shaders/AnimatedSprite.frag");
+		m_shader.loadFromMemory(s_vertexShader, s_fragmentShader);
 	}
 
 	AnimatedSprite::AnimatedSprite(AnimationData _data)
@@ -51,13 +73,7 @@ namespace Animation
 		m_vertices.setPrimitiveType(sf::Quads);
 		m_vertices.resize(4);
 
-		const std::string vertName = "Shaders/AnimatedSprite.vert";
-		const std::string fragName = "Shaders/AnimatedSprite.frag";
-
-		if (!m_shader.loadFromFile(vertName, fragName))
-		{
-			std::cout << "Failed to load shaders: " << vertName << " - " << fragName << std::endl;
-		}
+		m_shader.loadFromMemory(s_vertexShader, s_fragmentShader);
 	}
 
 	void AnimatedSprite::update(float _deltaTime)
