@@ -21,22 +21,22 @@ namespace Animation
 
 		// Frame Selector
 		constexpr float FrameSelectorHeightInPercent = 265 * 100 / 1080 * 0.01;
-		constexpr const char* FrameSelectorTexturePath = "Textures/Arrows.png";
+		constexpr const char* FrameSelectorTexturePath = "Assets/Textures/Arrows.png";
 
 		// Preview Button
 		constexpr float PreviewButtonWidthInPercent = 200 * 100 / 1920 * 0.01;
 		constexpr float PreviewButtonHeightInPercent = 100 * 100 / 1080 * 0.01;
 		constexpr const char* PreviewButtonText = "Preview";
 
-		constexpr const char* FontPath = "Fonts/Font.ttf";
+		constexpr const char* FontPath = "Assets/Fonts/Font.ttf";
 
 		// Function Buttons
 		constexpr const char* IconsPath[4] =
 		{
-			"Textures/SaveIcon.png",
-			"Textures/OpenIcon.png",
-			"Textures/SaveAsIcon.png",
-			"Textures/EditIcon.png"
+			"Assets/Textures/SaveIcon.png",
+			"Assets/Textures/OpenIcon.png",
+			"Assets/Textures/SaveAsIcon.png",
+			"Assets/Textures/EditIcon.png"
 		};
 
 		// Editor Data Panel

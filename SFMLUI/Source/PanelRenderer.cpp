@@ -38,6 +38,11 @@ namespace UI
 		m_clearColor = _color;
 	}
 
+	void PanelRenderer::saveToFile(const std::string& _path)
+	{
+		m_renderTexture.getTexture().copyToImage().saveToFile(_path);
+	}
+
 	sf::RenderTarget& PanelRenderer::operator()()
 	{
 		return m_renderTexture;
@@ -46,7 +51,7 @@ namespace UI
 	void PanelRenderer::draw(sf::RenderTarget& _target, sf::RenderStates _states) const
 	{
 		if (!isVisible()) return;
-		
+
 		// TODO: Change this to avoid const_cast
 		const_cast<PanelRenderer*>(this)->renderChildrenOnTexture(_states);
 

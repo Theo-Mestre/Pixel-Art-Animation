@@ -39,7 +39,7 @@ project (CoreName)
 
    targetdir ("../binaries/" .. OutputDir .. "/" .. CoreName)
    objdir ("../binaries/intermediates/" .. OutputDir .. "/" .. CoreName)
-   debugdir "../Assets/"
+   debugdir "../"
 
    filter "system:windows"
        systemversion "latest"

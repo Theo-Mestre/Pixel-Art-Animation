@@ -20,6 +20,8 @@ namespace UI
 
 		void setClearColor(const sf::Color& _color);
 
+		void saveToFile(const std::string& _path);
+
 		sf::RenderTarget& operator()();
 	private:
 		virtual void draw(sf::RenderTarget& _target, sf::RenderStates _states) const override;

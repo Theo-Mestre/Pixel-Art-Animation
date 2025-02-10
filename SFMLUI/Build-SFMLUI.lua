@@ -35,7 +35,7 @@ project "SFMLUI"
 
    targetdir ("../binaries/" .. OutputDir .. "/SFMLUI")
    objdir ("../binaries/intermediates/" .. OutputDir .. "/SFMLUI")
-   debugdir "../Assets/"
+   debugdir "../"
 
    filter "system:windows"
        systemversion "latest"

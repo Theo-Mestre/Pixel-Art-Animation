@@ -4,8 +4,8 @@
 
 #include "Application.h"
 
-constexpr const char* TEXTURE_PATH = "Texture.png";
-constexpr const char* ANIMATION_PATH = "AnimationCombine.png";
+constexpr const char* TEXTURE_PATH = "Assets/Texture.png";
+constexpr const char* ANIMATION_PATH = "Assets/AnimationCombine.png";
 constexpr uint32_t ANIM_COUNT_X = 6;
 constexpr uint32_t ANIM_COUNT_Y = 2;
 
