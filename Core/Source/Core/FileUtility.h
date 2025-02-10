@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace Utility
 {
 	/// <summary>
@@ -10,5 +12,7 @@ namespace Utility
 	/// <returns></returns>
 	std::string TruncatePath(const std::string& _path);
 
-	std::string OpenFileDialog(const std::string& _fileType, const std::string& extension);
+	std::string OpenFileDialog(const std::string& _fileType, const std::string& _extension);
+
+	std::string SaveFileDialog(const std::vector<std::string>& _extension);
 }

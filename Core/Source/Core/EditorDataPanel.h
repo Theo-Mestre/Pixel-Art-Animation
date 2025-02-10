@@ -55,8 +55,10 @@ namespace Animation
 		struct AnimCountEditUI
 		{
 			UI::Label* Label = nullptr;
+			UI::Label* MinusLabel = nullptr;
 			UI::Button* Minus = nullptr;
 			UI::Label* Value = nullptr;
+			UI::Label* PlusLabel = nullptr;
 			UI::Button* Plus = nullptr;
 		};
 

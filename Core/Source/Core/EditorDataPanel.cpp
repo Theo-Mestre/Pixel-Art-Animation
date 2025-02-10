@@ -42,7 +42,9 @@ namespace Animation
 		for (size_t i = 0; i < DimensionNumber; i++)
 		{
 			m_animCountUI.EditUI[i].Minus = nullptr;
+			m_animCountUI.EditUI[i].MinusLabel = nullptr;
 			m_animCountUI.EditUI[i].Plus = nullptr;
+			m_animCountUI.EditUI[i].PlusLabel = nullptr;
 			m_animCountUI.EditUI[i].Value = nullptr;
 		}
 
@@ -148,6 +150,22 @@ namespace Animation
 			yPos = m_animCountUI.EditUI[i].Value->getSize().y / 2.0f;
 			value.setPosition({ xPos, yPos });
 			value.setOrigin({ width / 2.0f, height / 1.25f });
+
+			auto& minusLabel = m_animCountUI.EditUI[i].MinusLabel->asText();
+			width = minusLabel.getGlobalBounds().width;
+			height = minusLabel.getGlobalBounds().height;
+			xPos = m_animCountUI.EditUI[i].MinusLabel->getSize().x / 2.0f;
+			yPos = m_animCountUI.EditUI[i].MinusLabel->getSize().y / 2.0f;
+			minusLabel.setPosition({ xPos, yPos - 15.0f });
+			minusLabel.setOrigin({ width / 2.0f, height / 2.0f });
+
+			auto& plusLabel = m_animCountUI.EditUI[i].PlusLabel->asText();
+			width = plusLabel.getGlobalBounds().width;
+			height = plusLabel.getGlobalBounds().height;
+			xPos = m_animCountUI.EditUI[i].PlusLabel->getSize().x / 2.0f;
+			yPos = m_animCountUI.EditUI[i].PlusLabel->getSize().y / 2.0f;
+			plusLabel.setPosition({ xPos, yPos - 10.0f });
+			plusLabel.setOrigin({ width / 2.0f, height / 1.25f });
 		}
 	}
 
@@ -285,9 +303,20 @@ namespace Animation
 			m_animCountUI.EditUI[i].Minus->setSize({ buttonWidth, height });
 			m_animCountUI.EditUI[i].Minus->setColor(ButtonColor);
 			m_animCountUI.EditUI[i].Minus->setCallback([this, i]() { decrementAnimCount(i); });
-			m_animCountUI.EditUI[i].Minus->setPosition({ buttonPos + j++ * (PanelPadding + buttonWidth), yPos });
+			m_animCountUI.EditUI[i].Minus->setPosition({ buttonPos + j * (PanelPadding + buttonWidth), yPos });
 
 			addChild(m_animCountUI.EditUI[i].Minus);
+
+			m_animCountUI.EditUI[i].MinusLabel = new UI::Label();
+			m_animCountUI.EditUI[i].MinusLabel->initialize();
+			m_animCountUI.EditUI[i].MinusLabel->setString("-");
+			m_animCountUI.EditUI[i].MinusLabel->setSize({ buttonWidth, height });
+			m_animCountUI.EditUI[i].MinusLabel->setColor(LabelColor);
+			m_animCountUI.EditUI[i].MinusLabel->setColor(sf::Color::Transparent);
+			m_animCountUI.EditUI[i].MinusLabel->setPosition({ buttonPos + j++ * (PanelPadding + buttonWidth), yPos });
+
+			addChild(m_animCountUI.EditUI[i].MinusLabel);
+			m_texts.push_back(&m_animCountUI.EditUI[i].MinusLabel->asText());
 
 			m_animCountUI.EditUI[i].Value = new UI::Label();
 			m_animCountUI.EditUI[i].Value->initialize();
@@ -304,9 +333,20 @@ namespace Animation
 			m_animCountUI.EditUI[i].Plus->setSize({ buttonWidth, height });
 			m_animCountUI.EditUI[i].Plus->setColor(ButtonColor);
 			m_animCountUI.EditUI[i].Plus->setCallback([this, i]() { incrementAnimCount(i); });
-			m_animCountUI.EditUI[i].Plus->setPosition({ buttonPos + j++ * (PanelPadding + buttonWidth), yPos });
+			m_animCountUI.EditUI[i].Plus->setPosition({ buttonPos + j * (PanelPadding + buttonWidth), yPos });
 
 			addChild(m_animCountUI.EditUI[i].Plus);
+
+			m_animCountUI.EditUI[i].PlusLabel = new UI::Label();
+			m_animCountUI.EditUI[i].PlusLabel->initialize();
+			m_animCountUI.EditUI[i].PlusLabel->setString("+");
+			m_animCountUI.EditUI[i].PlusLabel->setSize({ buttonWidth, height });
+			m_animCountUI.EditUI[i].PlusLabel->setColor(LabelColor);
+			m_animCountUI.EditUI[i].PlusLabel->setColor(sf::Color::Transparent);
+			m_animCountUI.EditUI[i].PlusLabel->setPosition({ buttonPos + j++ * (PanelPadding + buttonWidth), yPos });
+
+			addChild(m_animCountUI.EditUI[i].PlusLabel);
+			m_texts.push_back(&m_animCountUI.EditUI[i].PlusLabel->asText());
 		}
 	}
 }

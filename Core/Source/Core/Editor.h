@@ -31,6 +31,7 @@ namespace Animation
 		UI::Vec2u AnimationCount;
 		std::string AnimationPath;
 		std::string TexturePath;
+		float FrameDuration = 0.1f;
 	};
 
 	namespace SelectedImage
@@ -62,7 +63,8 @@ namespace Animation
 		void setResetCallback(const std::function<void(EditorData*)>& _callback) { m_onReset = _callback; }
 
 	private:
-		void saveAnimationFile(bool _overrideOriginalTexture = false);
+		void saveAnimationTexture();
+		void saveAs();
 
 		void processSelectedPosition(SelectedImage::SelectedImage _selectedImage, UI::MousePickerModule* _picker);
 		void updateAnimationImage(const UI::Vec2i& _animCoord, const UI::Vec2i& _texCoord);
@@ -70,7 +72,9 @@ namespace Animation
 		sf::Color getCoordColor(const UI::Vec2i& _position);
 		void updateAnimationRect();
 
-		void OpenTextureFile(SelectedImage::SelectedImage _texID);
+		void SaveAnimFile(const std::string& _path);
+		void OpenAnimFile();
+		void ReadAnimFile(const std::string& _path);
 		void TogglePreviewPanel();
 		void ToggleEditorDataPanel();
 

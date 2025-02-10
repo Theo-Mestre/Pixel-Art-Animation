@@ -80,19 +80,31 @@ namespace Animation
 		m_data = _editorData;
 	}
 
-	void Editor::saveAnimationFile(bool _overrideOriginalTexture)
+	void Editor::saveAnimationTexture()
 	{
 		updateImageData();
-		bool status = false;
+		bool status = m_animationImage.saveToFile(m_data.AnimationPath);
+		std::cout << (status ? "Animation saved successfully." : "Failed to save animation.") << std::endl;
+	}
 
-		if (_overrideOriginalTexture)
+	void Editor::saveAs()
+	{
+		std::string path = Utility::SaveFileDialog({ ".anim", ".png" });
+		if (path.empty()) return;
+
+		std::string extension = path.substr(path.find_last_of('.'));
+
+		if (extension == ".anim")
 		{
-			status = m_animationImage.saveToFile(m_data.AnimationPath);
-			std::cout << (status ? "Animation saved successfully." : "Failed to save animation.") << std::endl;
+			SaveAnimFile(path);
 			return;
 		}
 
-		std::cout << "Save as file not implemented yet." << std::endl;
+		if (extension == ".png")
+		{
+			m_data.AnimationPath = path;
+			saveAnimationTexture();	
+		}
 	}
 
 #pragma region ImageProcessing
@@ -169,21 +181,73 @@ namespace Animation
 		m_animationImageUI->setTextureRect({ (int)(m_selectedFrame.x * m_animFrameSize.x), (int)(m_selectedFrame.y * m_animFrameSize.y), (int)m_animFrameSize.x, (int)m_animFrameSize.y });
 	}
 
-	void Editor::OpenTextureFile(SelectedImage::SelectedImage _texID)
+	void Editor::SaveAnimFile(const std::string& _path)
 	{
-		if (_texID < 0 || _texID >= SelectedImage::Count) return;
+		std::ofstream file(_path, std::ios::out);
+		if (!file.is_open())
+		{
+			std::cout << "Failed to open file: " << m_data.AnimationPath << std::endl;
+			return;
+		}
 
+		file << m_data.AnimationPath << std::endl;
+		file << m_data.TexturePath << std::endl;
+		file << m_data.AnimationCount.x << " " << m_data.AnimationCount.y << std::endl;
+		file << m_data.FrameDuration << std::endl;
+
+		file.close();
+
+		std::cout << "Animation file saved successfully." << std::endl;
+	}
+
+	void Editor::OpenAnimFile()
+	{
 		std::string path = Utility::OpenFileDialog("Animation File", "anim");
 		if (path.empty()) return;
 
-		auto& texPath = _texID == SelectedImage::Animation ? m_data.AnimationPath : m_data.TexturePath;
-		texPath = path;
+		ReadAnimFile(path);
 
 		if (m_onReset != nullptr)
 		{
 			std::cout << "Resetting the editor." << std::endl;
 			m_onReset(&m_data);
 		}
+	}
+
+	void Editor::ReadAnimFile(const std::string& _path)
+	{
+		std::ifstream file(_path, std::ios::in);
+		if (!file.is_open())
+		{
+			std::cout << "Failed to open file: " << _path << std::endl;
+			return;
+		}
+
+		std::string line;
+		std::getline(file, line);
+
+		m_data.AnimationPath = line;
+
+		std::getline(file, line);
+		m_data.TexturePath = line;
+
+		std::getline(file, line);
+
+		{ // Read the animation count
+			std::stringstream ss(line);
+
+			ss >> m_data.AnimationCount.x;
+			ss >> m_data.AnimationCount.y;
+		}
+
+		{ // Read the animation speed
+			std::getline(file, line);
+			std::stringstream ss(line);
+
+			ss >> m_data.FrameDuration;
+		}
+
+		file.close();
 	}
 
 	void Editor::TogglePreviewPanel()
@@ -209,9 +273,9 @@ namespace Animation
 
 		if (isVisible && m_onReset != nullptr)
 		{
-				std::cout << "Resetting the editor." << std::endl;
-				m_onReset(&m_data);
-				return;
+			std::cout << "Resetting the editor." << std::endl;
+			m_onReset(&m_data);
+			return;
 		}
 
 		m_editorDataPanel->setVisible(!isVisible);
@@ -293,9 +357,9 @@ namespace Animation
 
 		m_functionButtons->initialize();
 		m_functionButtons->setPosition(UI::Vec2(PanelPadding, PanelPadding));
-		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::SaveFile, [this]() { saveAnimationFile(true); });
-		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::SaveAsFile, [this]() { saveAnimationFile(); });
-		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::OpenFile, [this]() { OpenTextureFile(SelectedImage::Animation); });
+		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::SaveFile, [this]() { saveAnimationTexture(); });
+		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::SaveAsFile, [this]() { saveAs(); });
+		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::OpenFile, [this]() { OpenAnimFile(); });
 		m_functionButtons->setButtonCallback(FunctionButtons::ButtonType::EditData, [this]() { ToggleEditorDataPanel(); });
 
 		// Initialize the frame selector
@@ -429,6 +493,7 @@ namespace Animation
 		sprite.setPosition(spritePosition);
 		sprite.setOrigin(origin);
 		sprite.setScale(scale, scale);
+		sprite.setFrameDuration(m_data.FrameDuration);
 
 		m_previewPanel->addModule(m_spriteModule);
 
