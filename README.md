@@ -7,6 +7,10 @@ Pixel-Art-Animation is a C++ project using SFML that simplifies the process of c
 2. **AnimatedSprite Class**: A reusable class for working with mapped animations, making it easy to integrate animations into your projects.
 3. **Editor Tool**: An editor built with a custom SFML-based UI library (currently in development) to facilitate the creation and adjustment of texture coordinate mappings.
 
+<img width="4242" alt="AnimationProcessDetails" src="https://github.com/user-attachments/assets/7615f787-e92b-400a-91bd-517624bac3d8" />
+
+Sprites used in the demo can be found [here](https://craftpix.net/freebies/free-3-character-sprite-sheets-pixel-art/).
+
 ## Getting Started
 
 All dependencies are included in the project so all you need to do is clone and build the project!
