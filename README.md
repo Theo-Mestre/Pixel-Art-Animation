@@ -78,6 +78,9 @@ int main()
 #### Editor
 Run the editor to create or modify animation mappings for your texture. Once completed, save the mappings to integrate them into your game or project.
 
+The Editor is available [here](https://github.com/Theo-Mestre/Pixel-Art-Animation/releases), It's still in early stage so some features may be missing and some bug might be encountered.
+There isn't any documention on the Editor yet. You can refer to the [figma board](https://www.figma.com/design/pwXmeGTGsy7Qp3yq8xyIjQ/Pixel-Art-Animator?node-id=0-1&t=cYlQ9sqwOG7hhH4U-1) to see what which buttons does. 
+
 Figma Board: https://www.figma.com/design/pwXmeGTGsy7Qp3yq8xyIjQ/Pixel-Art-Animator?node-id=0-1&t=cYlQ9sqwOG7hhH4U-1
 
 ## Contributing
